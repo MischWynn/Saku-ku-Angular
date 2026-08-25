@@ -1,0 +1,123 @@
+@reference "../../../styles.css";
+
+/* Base Wrapper with Subtle Radial Emerald Glow */
+.login-page-wrapper {
+  @apply min-h-screen w-full flex items-center justify-center p-4 sm:p-6 bg-slate-950 font-sans relative overflow-hidden select-none;
+  background-image: radial-gradient(ellipse 70% 60% at 50% -10%, rgba(16, 185, 129, 0.14), rgba(17, 24, 39, 0.95), #020617);
+}
+
+/* Ambient Glow Blobs in Background */
+.glow-blob-1 {
+  @apply absolute -top-24 -left-24 w-96 h-96 rounded-full blur-[120px] pointer-events-none opacity-40;
+  background-color: #10B981;
+}
+
+.glow-blob-2 {
+  @apply absolute -bottom-24 -right-24 w-96 h-96 rounded-full blur-[120px] pointer-events-none opacity-25;
+  background-color: #047857;
+}
+
+/* Main Frosted Glass Card */
+.login-shell-card {
+  @apply relative z-10 w-full max-w-5xl rounded-3xl p-4 sm:p-8 backdrop-blur-2xl border shadow-2xl;
+  background-color: rgba(17, 24, 39, 0.7); /* #111827 Glass */
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px -10px rgba(16, 185, 129, 0.15);
+}
+
+/* Left Hero Banner */
+.hero-banner-box {
+  @apply relative hidden lg:flex min-h-[480px] rounded-2xl overflow-hidden border items-end p-7;
+  border-color: rgba(255, 255, 255, 0.06);
+  background-color: rgba(15, 23, 42, 0.6);
+}
+
+.hero-bg-img {
+  @apply absolute inset-0 w-full h-full object-cover opacity-70 transition-transform duration-700 ease-out;
+}
+
+.hero-banner-box:hover .hero-bg-img {
+  @apply scale-105 opacity-80;
+}
+
+.hero-gradient-overlay {
+  @apply absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent;
+}
+
+/* Floating Glass Badge inside Hero */
+.hero-glass-badge {
+  @apply relative z-10 w-full max-w-sm rounded-2xl p-5 backdrop-blur-xl border shadow-lg;
+  background-color: rgba(17, 24, 39, 0.75);
+  border-color: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+.portal-tag {
+  @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold mb-2 border;
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #6EE7B7;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.portal-tag-dot {
+  @apply w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_6px_#10B981];
+}
+
+/* Right Form Card Box */
+.login-form-box {
+  @apply w-full max-w-md mx-auto lg:max-w-none rounded-2xl p-6 sm:p-8 backdrop-blur-md border;
+  background-color: rgba(17, 24, 39, 0.45);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Brand Box */
+.brand-icon-wrapper {
+  @apply w-10 h-10 rounded-xl flex items-center justify-center border shadow-md shrink-0;
+  background-color: rgba(16, 185, 129, 0.12);
+  border-color: rgba(174, 228, 210, 0.3);
+}
+
+.brand-logo-mask{
+  @apply w-7 h-7 inline-block;
+  background-color: #10B981; /* Emerald Green */
+  -webkit-mask: url('/assets/wallet-logo.svg') no-repeat center / contain;
+  mask: url('/assets/wallet-logo.svg') no-repeat center / contain;
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5));
+} 
+
+.brand-logo-img {
+  @apply w-5 h-5 object-contain drop-shadow-[0_0_8px_rgba(16,185,129,0.5)];
+}
+
+/* Custom Inputs */
+.form-label-custom {
+  @apply block text-xs font-semibold text-slate-300 mb-1.5 tracking-wide;
+}
+
+.input-field-custom {
+  @apply w-full pl-10 pr-4 py-2.5 text-xs text-slate-100 rounded-xl outline-none placeholder-slate-500 transition-all duration-200 border;
+  background-color: rgba(2, 6, 23, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.input-field-custom:focus {
+  border-color: #10B981;
+  background-color: rgba(2, 6, 23, 0.85);
+  box-shadow: 0 0 15px -3px rgba(16, 185, 129, 0.35);
+}
+
+/* Submit Button */
+.btn-login-submit {
+  @apply w-full py-3 px-4 mt-3 font-bold text-xs rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer text-slate-950;
+  background: linear-gradient(135deg, #6EE7B7 0%, #10B981 100%);
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.4);
+}
+
+.btn-login-submit:hover:not(:disabled) {
+  @apply scale-[1.01] brightness-105;
+  box-shadow: 0 6px 25px 0 rgba(16, 185, 129, 0.55);
+}
+
+.btn-login-submit:disabled {
+  @apply opacity-30 cursor-not-allowed shadow-none scale-100;
+}

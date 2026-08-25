@@ -1,0 +1,424 @@
+<div class="landing-container">
+
+<!-- Ambient Glow Background -->
+  <div class="glow-spot-top"></div>
+  <div class="glow-spot-bottom"></div>
+
+<!-- Top Navigation Header -->
+<nav class="landing-nav">
+  <div class="brand-group">
+    <span class="brand-logo-mask"></span>
+    <span class="brand-name">Saku-ku</span>
+  </div>
+  
+  <div class="nav-links-right">
+    <button 
+      type="button" 
+      (click)="goToLogin()" 
+      class="btn-nav-login"
+    >
+      <span>Masuk Staff</span>
+      <lucide-icon [img]="ArrowUpRightIcon" class="w-4 h-4"></lucide-icon>
+    </button>
+  </div>
+</nav>
+  
+  <!-- Hero Content Section -->
+  <section id="beranda" class="hero-section">
+    
+    <!-- Hero Title & Subtitle -->
+    <div class="hero-header-text">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Platform Financing & Pinjaman Modern
+      </div>
+      <h1 class="hero-title">
+        Kelola Plafond & Pinjaman <br />
+        <span class="text-gradient">Lebih Cepat, Transparan, & Aman</span>
+      </h1>
+      <p class="hero-description">
+        Solusi finansial terintegrasi untuk pengajuan instan, manajemen risiko cerdas, dan persetujuan otomatis.
+      </p>
+    </div>
+
+    <!-- Central Showcase with Surrounding Sticker Badges & Doodles -->
+    <div class="showcase-stage">
+
+      <!-- Center Phone Object -->
+      <div class="phone-wrapper">
+        <img 
+          src="assets/handonphone.png" 
+          alt="Saku-ku Mobile App" 
+          class="phone-image"
+        />
+      </div>
+
+      <!-- Floating Financing Badges / Stickers -->
+      
+      <!-- Top Left: Plafond Instan (Lemon Accent) -->
+      <div class="badge-sticker badge-top-left">
+        <u>Plafond Instan s/d 50 Juta</u>
+      </div>
+
+      <!-- Top Right: Approval 1 Jam (Emerald Gradient Pill) -->
+      <div class="badge-sticker badge-top-right">
+        ⚡ Approval dalam 1 Jam
+      </div>
+
+      <!-- Mid Right: Bunga Transparan (3D Glass Mint) -->
+      <div class="badge-sticker badge-mid-right">
+        Bunga Ringan Mulai 0.8%
+      </div>
+
+      <!-- Bottom Left: OJK / Security (Solid Pill) -->
+      <div class="badge-sticker badge-bottom-left">
+        TERVERIFIKASI & DIAWASI
+      </div>
+
+      <!-- Bottom Center: Hitung Simulasi (Cyan-Blue Pill) -->
+      <button type="button" class="badge-sticker badge-bottom-center">
+        Hitung Simulasi Pinjaman &rarr;
+      </button>
+
+      <!-- Bottom Right: Ajukan Pinjaman (Dashed Emerald) -->
+      <button type="button" class="badge-sticker badge-bottom-right">
+        Ajukan Pinjaman Sekarang &rarr;
+      </button>
+
+
+      <!-- SVG Doodles & Scribbles -->
+
+      <!-- 1. Top Arrow Scribble -->
+      <svg class="doodle doodle-arrow-top" viewBox="0 0 30 30">
+        <path d="M 20 5 Q 26 18 12 24" />
+        <path d="M 12 18 L 12 24 L 18 24" />
+      </svg>
+
+      <!-- 2. Sparkle Star Left -->
+      <svg class="doodle doodle-sparkle-left" viewBox="0 0 28 28">
+        <path d="M 14 2 Q 14 14 2 14 Q 14 14 14 26 Q 14 14 26 14 Q 14 14 14 2 Z" fill="#6EE7B7" />
+      </svg>
+
+      <!-- 3. Sparkle Burst Right -->
+      <svg class="doodle doodle-burst-right" viewBox="0 0 24 24">
+        <line x1="6" y1="18" x2="2" y2="12" />
+        <line x1="12" y1="18" x2="16" y2="8" />
+      </svg>
+
+      <!-- 4. Bracket Curve Mid -->
+      <svg class="doodle doodle-bracket-mid" viewBox="0 0 20 24">
+        <path d="M 14 4 Q 4 8 4 14 Q 4 18 14 20" />
+      </svg>
+
+      <!-- 5. Bottom Curved Arrow -->
+      <svg class="doodle doodle-arrow-bottom" viewBox="0 0 32 32">
+        <path d="M 6 18 Q 16 4 24 14" />
+        <path d="M 18 14 L 24 14 L 24 8" />
+      </svg>
+
+    </div>
+
+  </section>
+
+
+<!--  MENGAPA MEMILIH SAKU-KU (FITUR) -->
+
+<section id="fitur" class="section-container scroll-mt-36">
+  
+  <div class="section-header">
+    <h2 class="section-title">Mengapa Memilih Saku-ku?</h2>
+    <p class="section-subtitle">
+      Dirancang untuk memberikan pengalaman finansial terbaik dengan teknologi terkini dan keamanan berlapis.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    
+    <!-- Fitur 1: Proses Kilat -->
+    <div class="feature-card group">
+      <div class="feature-icon-box">
+        <lucide-icon [img]="ClockIcon" class="w-5 h-5 text-[#6EE7B7]"></lucide-icon>
+      </div>
+      <h3 class="feature-title">Proses Kilat</h3>
+      <p class="feature-desc">
+        Persetujuan dalam hitungan menit berkat teknologi AI kami yang mutakhir.
+      </p>
+    </div>
+
+    <!-- Fitur 2: Keamanan Terjamin -->
+    <div class="feature-card group">
+      <div class="feature-icon-box">
+        <lucide-icon [img]="ShieldIcon" class="w-5 h-5 text-[#10B981]"></lucide-icon>
+      </div>
+      <h3 class="feature-title">Keamanan Terjamin</h3>
+      <p class="feature-desc">
+        Data Anda dienkripsi tingkat bank dan diawasi ketat oleh otoritas terkait.
+      </p>
+    </div>
+
+    <!-- Fitur 3: Bunga Kompetitif -->
+    <div class="feature-card group">
+      <div class="feature-icon-box">
+        <lucide-icon [img]="PercentIcon" class="w-5 h-5 text-[#6EE7B7]"></lucide-icon>
+      </div>
+      <h3 class="feature-title">Bunga Kompetitif</h3>
+      <p class="feature-desc">
+        Nikmati suku bunga rendah dan transparan tanpa ada biaya tersembunyi.
+      </p>
+    </div>
+
+    <!-- Fitur 4: Tanpa Jaminan -->
+    <div class="feature-card group">
+      <div class="feature-icon-box">
+        <lucide-icon [img]="HandCoinsIcon" class="w-5 h-5 text-[#10B981]"></lucide-icon>
+      </div>
+      <h3 class="feature-title">Tanpa Jaminan</h3>
+      <p class="feature-desc">
+        Dapatkan akses dana cepat tanpa perlu mengagunkan aset berharga Anda.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- CARA KERJA (WORKFLOW 4 LANGKAH) -->
+
+<section id="cara-kerja" class="section-container scroll-mt-36">
+  
+  <div class="section-header">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/10 border border-[#10B981]/30 mb-3">
+      <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
+      Alur Pengajuan
+    </div>
+    <h2 class="section-title">Cara Mudah Mendapatkan Pendanaan</h2>
+    <p class="section-subtitle">
+      Hanya 4 langkah cepat dan mudah untuk mencairkan limit plafond Anda.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+    
+    <!-- Step 1 -->
+    <div class="step-card">
+      <span class="step-number">01</span>
+      <div class="step-icon-wrapper">
+        <lucide-icon [img]="UserPlusIcon" class="w-5 h-5 text-[#6EE7B7]"></lucide-icon>
+      </div>
+      <h3 class="step-title">Registrasi Akun</h3>
+      <p class="step-desc">
+        Daftar menggunakan nomor HP & e-KTP untuk verifikasi identitas secara instan.
+      </p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card">
+      <span class="step-number">02</span>
+      <div class="step-icon-wrapper">
+        <lucide-icon [img]="FileTextIcon" class="w-5 h-5 text-[#10B981]"></lucide-icon>
+      </div>
+      <h3 class="step-title">Ajukan Pinjaman</h3>
+      <p class="step-desc">
+        Tentukan jumlah nominal dana serta tenor pengembalian sesuai kebutuhan.
+      </p>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card">
+      <span class="step-number">03</span>
+      <div class="step-icon-wrapper">
+        <lucide-icon [img]="SearchCheckIcon" class="w-5 h-5 text-[#6EE7B7]"></lucide-icon>
+      </div>
+      <h3 class="step-title">Review & Verifikasi</h3>
+      <p class="step-desc">
+        Tim analis dan sistem cerdas memeriksa kelayakan berkas secara real-time.
+      </p>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card">
+      <span class="step-number">04</span>
+      <div class="step-icon-wrapper">
+        <lucide-icon [img]="WalletCardsIcon" class="w-5 h-5 text-[#10B981]"></lucide-icon>
+      </div>
+      <h3 class="step-title">Pencairan Dana</h3>
+      <p class="step-desc">
+        Setelah disetujui, dana langsung ditransfer ke rekening bank terdaftar Anda.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- STRUKTUR TARIF TRANSPARAN (BUNGA & TENOR) -->
+
+<section id="tarif" class="section-container scroll-mt-36">
+  
+  <div class="section-header">
+    <h2 class="section-title">Produk Suku Bunga</h2>
+    <p class="section-subtitle">
+      Pilih tenor yang sesuai dengan kemampuan dan rencana keuangan Anda.
+    </p>
+  </div>
+
+  <div class="rates-wrapper-card">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+
+      <!-- 6 Bulan -->
+      <div class="rate-item-box">
+        <span class="rate-tenor">6 BULAN</span>
+        <h4 class="rate-value">5.0%</h4>
+        <span class="rate-label">Bunga Efektif per tahun</span>
+      </div>
+
+      <!-- 12 Bulan -->
+      <div class="rate-item-box">
+        <span class="rate-tenor">12 BULAN</span>
+        <h4 class="rate-value">8.0%</h4>
+        <span class="rate-label">Bunga Efektif per tahun</span>
+      </div>
+
+      <!-- 18 Bulan (Populer Pill) -->
+      <div class="rate-item-box rate-popular">
+        <div class="popular-badge">Populer</div>
+        <span class="rate-tenor text-[#6EE7B7]">18 BULAN</span>
+        <h4 class="rate-value text-white">10.0%</h4>
+        <span class="rate-label">Bunga Efektif per tahun</span>
+      </div>
+
+      <!-- 24 Bulan -->
+      <div class="rate-item-box">
+        <span class="rate-tenor">24 BULAN</span>
+        <h4 class="rate-value">12.0%</h4>
+        <span class="rate-label">Bunga Efektif per tahun</span>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="rates-disclaimer">
+    *Suku bunga dapat berubah sewaktu-waktu sesuai dengan kebijakan perusahaan dan profil risiko nasabah.
+  </p>
+
+</section>
+
+<!-- SIMULASI KREDIT -->
+
+
+<!--  BILLBOARDS CTA BANNER SECTION -->
+
+<section class="billboard-section">
+  <div class="billboard-container">
+    
+    <!-- Background Billboard Image -->
+    <img 
+      src="assets/Billboards.png" 
+      alt="Saku-ku Billboard" 
+      class="billboard-bg-img"
+    />
+    <div class="billboard-overlay"></div>
+
+    <!-- Floating Glass Banner Content -->
+    <div class="billboard-content-card">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/15 border border-[#10B981]/30 mb-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
+        Ekspansi Finansial Terpercaya
+      </div>
+
+      <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug">
+        Siap Mewujudkan Rencana Finansial Anda?
+      </h2>
+      
+      <p class="text-xs sm:text-sm text-slate-300 mt-2 max-w-xl">
+        Dapatkan akses pendanaan transparan dengan bunga kompetitif, proses kilat, dan proteksi enkripsi standar perbankan.
+      </p>
+
+      <div class="mt-6 flex flex-wrap items-center gap-4">
+        <a routerLink="/login" class="btn-billboard-cta">
+          <span>Mulai Pengajuan Sekarang</span>
+          <span class="w-5 h-5 rounded-full bg-slate-950/20 flex items-center justify-center font-bold text-xs">&rarr;</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!-- FOOTER GLASSMORPHISM SECTION -->
+<section id="footer">
+<footer class="footer-wrapper">
+  <div class="footer-container">
+
+    <!-- Top Grid: Brand & Link Columns -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-8 sm:gap-12 pb-12 border-b border-white/10">
+
+      <!-- Col 1: Brand Info (Lebar 2 Kolom) -->
+      <div class="md:col-span-2 space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="footer-brand-logo-mask"></span>
+          <span class="text-xl font-bold text-white tracking-tight">Saku-ku</span>
+        </div>
+        <p class="text-xs text-slate-400 leading-relaxed max-w-sm">
+          Solusi manajemen pinjaman digital terdepan untuk meningkatkan inklusi keuangan di Indonesia melalui teknologi yang aman dan mudah diakses.
+        </p>
+      </div>
+
+      <!-- Col 2: Navigasi -->
+      <div class="space-y-3">
+        <h4 class="footer-col-title">Navigasi</h4>
+        <ul class="footer-link-list">
+          <li><a routerLink="/" class="footer-link">Tentang Kami</a></li>
+          <li><a routerLink="/" class="footer-link">Syarat & Ketentuan</a></li>
+          <li><a routerLink="/" class="footer-link">Kebijakan Privasi</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Bantuan -->
+      <div class="space-y-3">
+        <h4 class="footer-col-title">Bantuan</h4>
+        <ul class="footer-link-list">
+          <li><a routerLink="/" class="footer-link">Pusat Bantuan</a></li>
+          <li><a routerLink="/" class="footer-link">Kontak Admin</a></li>
+          <li><a routerLink="/" class="footer-link">Status Sistem</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Hubungi Kami -->
+      <div class="space-y-3">
+        <h4 class="footer-col-title">Hubungi Kami</h4>
+        <p class="text-xs text-slate-300 font-medium select-text">admin@saku-ku.com</p>
+        
+        <!-- Social Icon Badges -->
+        <div class="flex items-center gap-3 pt-2">
+          <a href="mailto:admin@saku-ku.com" class="social-icon-btn" title="Email">
+            <span class="text-xs font-bold">@</span>
+          </a>
+          <a href="#" class="social-icon-btn" title="Website">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar: Copyright & OJK Notice -->
+    <div class="footer-bottom-bar">
+      <p class="text-xs text-slate-500">
+        &copy; 2026 Saku-ku Financial Technology. Seluruh hak cipta dilindungi.
+      </p>
+
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-500">Berizin dan diawasi oleh</span>
+        <span class="ojk-badge">OJK</span>
+      </div>
+    </div>
+
+  </div>
+</footer>

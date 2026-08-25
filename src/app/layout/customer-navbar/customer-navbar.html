@@ -1,0 +1,27 @@
+<header class="dynamic-island">
+  <nav class="island-container">
+    <div class="flex items-center gap-0.5 sm:gap-2 overflow-x-auto no-scrollbar">
+      <button type="button" (click)="scrollToSection('fitur')" class="nav-link cursor-pointer">Fitur</button>
+      <button type="button" (click)="scrollToSection('cara-kerja')" class="nav-link cursor-pointer whitespace-nowrap">Cara Kerja</button>
+      <button type="button" (click)="scrollToSection('tarif')" class="nav-link cursor-pointer">Produk</button>
+      <button type="button" (click)="scrollToSection('footer')" class="nav-link cursor-pointer">Contact</button>
+    </div>
+      <!-- <a routerLink="/" fragment="fitur" class="nav-link">Fitur</a>
+      <a routerLink="/" fragment="cara-kerja" class="nav-link">Cara Kerja</a>
+      <a routerLink="/" fragment="tarif" class="nav-link">Produk</a>
+      <a routerLink="/" fragment="footer" class="nav-link">Contact</a>
+    </div> -->
+
+
+    <a 
+    href="https://play.google.com/store" target="_blank" 
+    rel="noopener noreferrer"class="btn-signup">
+      <span class="hidden sm:inline">Download Sekarang!</span>
+      <span class="sm:hidden">Download</span>
+    </a>
+  </nav>
+</header>
+
+<main class="w-full">
+  <router-outlet></router-outlet>
+</main>

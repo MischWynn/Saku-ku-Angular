@@ -1,0 +1,75 @@
+@reference "../../../styles.css";
+
+/* Section & Container Setup */
+.hero-section {
+  @apply relative w-full py-20 flex items-center justify-center overflow-hidden bg-slate-950;
+}
+
+.showcase-container {
+  @apply relative w-full max-w-4xl min-h-[550px] flex items-center justify-center;
+}
+
+/* Background Glow */
+.blob-glow {
+  @apply absolute inset-0 m-auto w-72 h-72 sm:w-96 sm:h-96 rounded-full blur-3xl pointer-events-none;
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+/* Main Device (Center) */
+.main-device {
+  @apply relative z-10 w-64 sm:w-80 transition-transform duration-500 hover:scale-105;
+}
+
+.device-image {
+  @apply w-full h-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.7)];
+}
+
+/* Floating Buttons & Badges */
+.badge-quick-action {
+  @apply absolute top-10 left-4 sm:left-12 z-20 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-2xl shadow-lg -rotate-6 hover:rotate-0 hover:scale-105 transition-all duration-200 cursor-pointer;
+  background-color: #BAFE43;
+}
+
+.badge-security {
+  @apply absolute top-16 right-4 sm:right-16 z-20 bg-slate-900/80 backdrop-blur-md border border-[#10B981]/30 text-[#10B981] font-semibold text-xs px-3.5 py-2 rounded-full shadow-md rotate-3 hidden sm:flex items-center gap-1.5;
+}
+
+.pulse-dot {
+  @apply w-2 h-2 rounded-full animate-pulse;
+  background-color: #10B981;
+}
+
+.badge-manage-balance {
+  @apply absolute bottom-16 left-6 sm:left-20 z-20 text-slate-950 font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-[0_6px_0_#047857] active:translate-y-1 active:shadow-[0_2px_0_#047857] -rotate-3 transition-transform cursor-pointer;
+  background-color: #10B981;
+}
+
+.badge-statistics {
+  @apply absolute bottom-20 right-6 sm:right-20 z-20 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-2xl shadow-lg rotate-6 hover:rotate-0 hover:scale-105 transition-all duration-200 cursor-pointer;
+  background: linear-gradient(to right, #BAFE43, #10B981);
+}
+
+/* Scribble / Doodle Base */
+.doodle {
+  @apply absolute pointer-events-none transition-all duration-300;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Posisi & Warna Masing-Masing Doodle */
+.doodle-arrow-top {
+  @apply top-24 left-36 sm:left-48 w-8 h-8 rotate-12 hidden sm:block;
+  stroke: #BAFE43;
+}
+
+.doodle-sparkle-right {
+  @apply top-1/2 right-10 sm:right-32 w-7 h-7 animate-bounce;
+  fill: #BAFE43;
+}
+
+.doodle-burst-left {
+  @apply top-1/2 left-8 sm:left-28 w-6 h-6;
+  stroke: #10B981;
+}
