@@ -84,16 +84,23 @@ export class SidebarComponent implements OnInit {
       .filter(group => group.items.length > 0);
   });
 
+  // ngOnInit(): void {
+  // const currentUrl = window.location.pathname;
+  //   if (currentUrl.includes('/admin')) {
+  //     this.currentUserRole.set('superadmin');
+  //   } else if (currentUrl.includes('/marketing')) {
+  //     this.currentUserRole.set('marketing');
+  //   } else if (currentUrl.includes('/branchmanager')) {
+  //     this.currentUserRole.set('branchmanager');
+  //   } else if (currentUrl.includes('/backoffice')) {
+  //     this.currentUserRole.set('backoffice');
+  //   }
+  // }
+
   ngOnInit(): void {
-  const currentUrl = window.location.pathname;
-    if (currentUrl.includes('/admin')) {
-      this.currentUserRole.set('superadmin');
-    } else if (currentUrl.includes('/marketing')) {
-      this.currentUserRole.set('marketing');
-    } else if (currentUrl.includes('/branchmanager')) {
-      this.currentUserRole.set('branchmanager');
-    } else if (currentUrl.includes('/backoffice')) {
-      this.currentUserRole.set('backoffice');
+    const storedRole = localStorage.getItem('userRole') as UserRole;
+    if (storedRole) {
+      this.currentUserRole.set(storedRole);
     }
   }
 

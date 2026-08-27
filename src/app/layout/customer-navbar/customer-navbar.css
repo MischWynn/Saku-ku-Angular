@@ -1,4 +1,4 @@
-@reference "../../../../styles.css";
+@reference "../../../styles.css";
 
 /* .dynamic-island {
   @apply fixed top-6 inset-x-0 z-50 flex justify-center px-4;

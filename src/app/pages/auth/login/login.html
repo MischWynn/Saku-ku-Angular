@@ -46,6 +46,12 @@
           <p class="text-xs text-slate-400 mt-1">Silakan masuk ke akun administrator Anda</p>
         </div>
 
+        @if (errorMessage()) {
+            <div class="alert alert-error text-red-500 text-sm mb-4">
+              {{ errorMessage() }}
+            </div>
+          }
+
         <!-- Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
           

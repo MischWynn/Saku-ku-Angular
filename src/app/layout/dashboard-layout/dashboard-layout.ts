@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SidebarComponent } from '../../../core/layout/sidebar/sidebar';
+import { SidebarComponent } from '../sidebar/sidebar';
 import { NavbarComponent } from '../navbar/navbar';
 import { LucideAngularModule, Menu } from 'lucide-angular';
 

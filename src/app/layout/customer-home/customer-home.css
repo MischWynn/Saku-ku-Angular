@@ -1,4 +1,4 @@
-@reference "../../../../styles.css";
+@reference "../../../styles.css";
 
 /* Landing Shell */
 .landing-container {
@@ -162,37 +162,78 @@
 .doodle-bracket-mid  { @apply top-[48%] left-[26%] w-6 h-7 hidden sm:block; }
 .doodle-arrow-bottom { @apply bottom-24 right-[28%] w-9 h-9 -rotate-12 hidden sm:block; } 
 
+/* Mesh Blob System — signature ambient layer, dipakai ulang di beberapa section */
+.mesh-blob {
+  @apply absolute rounded-full pointer-events-none;
+  filter: blur(120px);
+  will-change: transform;
+}
+
+.mesh-blob-1 {
+  @apply -top-20 left-[10%] w-[500px] h-[500px] opacity-25;
+  background: radial-gradient(circle, #10B981, transparent 70%);
+  animation: drift-a 18s ease-in-out infinite;
+}
+
+.mesh-blob-2 {
+  @apply top-[30%] right-[5%] w-[450px] h-[450px] opacity-20;
+  background: radial-gradient(circle, #6EE7B7, transparent 70%);
+  animation: drift-b 22s ease-in-out infinite;
+}
+
+.mesh-blob-3 {
+  @apply bottom-[10%] left-[20%] w-[400px] h-[400px] opacity-15;
+  background: radial-gradient(circle, #047857, transparent 70%);
+  animation: drift-a 26s ease-in-out infinite reverse;
+}
+
+@keyframes drift-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -30px) scale(1.08); }
+}
+
+@keyframes drift-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-35px, 40px) scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-blob { animation: none; }
+}
+
 
 .billboard-section {
   @apply w-full max-w-6xl mx-auto px-4 sm:px-6 my-16 select-none;
 }
 
-.billboard-container {
-  @apply relative min-h-[360px] sm:min-h-[420px] rounded-3xl overflow-hidden border flex items-center p-6 sm:p-12 shadow-2xl;
+.billboard-split-container {
+  @apply relative min-h-[380px] sm:min-h-[440px] rounded-3xl overflow-hidden border grid grid-cols-1 lg:grid-cols-2 shadow-2xl;
   border-color: rgba(255, 255, 255, 0.08);
   background-color: rgba(17, 24, 39, 0.9);
 }
 
-.billboard-bg-img {
-  @apply absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-700;
+.billboard-text-side {
+  @apply relative z-10 flex flex-col justify-center p-8 sm:p-12;
 }
 
-.billboard-container:hover .billboard-bg-img {
-  @apply scale-105 opacity-70;
+.billboard-visual-side {
+  @apply relative overflow-hidden min-h-[240px] lg:min-h-full;
+  clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
 }
 
-.billboard-overlay {
-  @apply absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent;
+.billboard-visual-img {
+  @apply absolute inset-0 w-full h-full object-cover transition-transform duration-700;
+  /* filter: grayscale(100%) brightness(0.9) sepia(0%) hue-rotate(100deg) saturate(3); */
 }
 
-.billboard-content-card {
-  @apply relative z-10 max-w-xl text-left;
+.billboard-visual-side:hover .billboard-visual-img {
+  @apply scale-105;
 }
 
-.btn-billboard-cta {
-  @apply inline-flex items-center gap-3 px-6 py-3 rounded-2xl text-xs font-bold text-slate-950 shadow-xl hover:scale-105 transition-all duration-200 cursor-pointer;
-  background: linear-gradient(135deg, #6EE7B7 0%, #10B981 100%);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+.billboard-visual-tint {
+  @apply absolute inset-0;
+  background: linear-gradient(135deg, rgba(16,185,129,0.35), rgba(2,6,23,0.55));
+  mix-blend-mode: multiply;
 }
 
 .footer-wrapper {
@@ -241,8 +282,9 @@
 /* ------------------------------------------------ */
 /* SHARED SECTION CONTAINERS                        */
 /* ------------------------------------------------ */
+
 .section-container {
-  @apply w-full max-w-6xl mx-auto px-4 sm:px-6 my-20 select-none;
+  @apply relative w-full max-w-6xl mx-auto px-4 sm:px-6 my-20 select-none;
 }
 
 .section-header {
@@ -255,6 +297,21 @@
 
 .section-subtitle {
   @apply text-xs sm:text-sm text-slate-400 leading-relaxed max-w-xl mx-auto;
+}
+
+.section-glow {
+  @apply absolute rounded-full pointer-events-none -z-10;
+  filter: blur(100px);
+}
+
+.section-glow-mint {
+  @apply top-1/4 -left-20 w-80 h-80 opacity-[0.12];
+  background: radial-gradient(circle, #6EE7B7, transparent 70%);
+}
+
+.section-glow-emerald {
+  @apply bottom-0 -right-20 w-96 h-96 opacity-[0.12];
+  background: radial-gradient(circle, #10B981, transparent 70%);
 }
 
 /* ------------------------------------------------ */
@@ -350,5 +407,12 @@
 
 .rates-disclaimer {
   @apply text-[11px] text-slate-500 text-center mt-4 italic;
+}
+
+.dot-grid-overlay {
+  @apply absolute inset-0 pointer-events-none opacity-[0.12];
+  background-image: radial-gradient(circle, rgba(255,255,255,0.4) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
 }
 
