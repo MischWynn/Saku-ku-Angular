@@ -2,10 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>AngularChallenge</title>
+  <title>Saku-ku</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  
+  <!-- TAMBAHKAN BARIS INI (Arahkan ke file icon kamu) -->
+  <link rel="icon" type="image/svg+xml" href="assets/wallet-colors.svg">
+  
+  <style>
+    .brand-logo-mask {
+      width: 1.75rem;
+      height: 1.75rem;
+      display: inline-block;
+      background-color: #10B981;
+      -webkit-mask: url('/assets/wallet-colors.svg') no-repeat center / contain;
+      mask: url('/assets/wallet-colors.svg') no-repeat center / contain;
+      filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5));
+    }
+  </style>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">

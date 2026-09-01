@@ -19,12 +19,17 @@ export interface DashboardSummary {
 }
 
 export interface ReviewActivity {
-  idReviewLog: string;
+  id: string;
   action: string;
   statusFrom: string;
   statusTo: string;
   catatan: string | null;
   createdAt: string;
-  pengajuan: { idPengajuan: string; nominalPengajuan: number, nominalDisetujui?: number| null, customer: { namaLengkap: string } };
+  pengajuan: { 
+    id: string; 
+    nominalPengajuan: number; 
+    nominalDisetujui?: number| null;
+    customer: { namaLengkap: string } 
+  };
   user: { namaLengkap: string };
 }
