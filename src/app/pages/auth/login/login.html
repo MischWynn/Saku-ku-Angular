@@ -60,7 +60,7 @@
             <label class="form-label-custom">Alamat Email</label>
             <div class="relative flex items-center">
               <span class="absolute left-3.5 text-slate-500">
-                <lucide-icon [img]="MailIcon" class="w-4 h-4"></lucide-icon>
+                <svg lucideMail class="w-4 h-4"></svg>
               </span>
               <input 
                 type="email" 
@@ -79,7 +79,7 @@
             </div>
             <div class="relative flex items-center">
               <span class="absolute left-3.5 text-slate-500">
-                <lucide-icon [img]="LockIcon" class="w-4 h-4"></lucide-icon>
+                <svg lucideLock class="w-4 h-4"></svg>
               </span>
               <input 
                 [type]="showPassword() ? 'text' : 'password'" 
@@ -92,7 +92,11 @@
                 (click)="togglePassword()" 
                 class="absolute right-3 text-slate-400 hover:text-[#6EE7B7] focus:outline-none transition cursor-pointer"
               >
-                <lucide-icon [img]="showPassword() ? EyeOffIcon : EyeIcon" class="w-4 h-4"></lucide-icon>
+                @if (showPassword()) {
+                  <svg lucideEyeOff class="w-4 h-4"></svg>
+                } @else {
+                  <svg lucideEye class="w-4 h-4"></svg>
+                }
               </button>
             </div>
           </div>
@@ -104,7 +108,7 @@
             class="btn-login-submit"
           >
             <span>Masuk Sekarang</span>
-            <lucide-icon [img]="ArrowRightIcon" class="w-4 h-4"></lucide-icon>
+            <svg lucideArrowRight class="w-4 h-4"></svg>
           </button>
 
           <!-- Back to Home Link -->

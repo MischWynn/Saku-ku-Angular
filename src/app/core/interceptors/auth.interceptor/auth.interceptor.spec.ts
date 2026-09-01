@@ -1,22 +1,55 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 
-import { AuthInterceptor } from './auth.interceptor';
+import { authInterceptor } from './auth.interceptor';
 
 describe('AuthInterceptor', () => {
-  let component: AuthInterceptor;
-  let fixture: ComponentFixture<AuthInterceptor>;
+  let http: HttpClient;
+  let httpMock: HttpTestingController;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [AuthInterceptor],
-    }).compileComponents();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+      ],
+    });
 
-    fixture = TestBed.createComponent(AuthInterceptor);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+    http = TestBed.inject(HttpClient);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  afterEach(() => {
+    httpMock.verify();
   });
+
+  it('should add authorization header when token exists', () => {
+    localStorage.setItem('auth_token', 'test-token');
+
+    http.get('/api/protected').subscribe();
+
+    const req = httpMock.expectOne('/api/protected');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+    req.flush({ ok: true });
+  });
+
+  it('should not add authorization header when token is missing', () => {
+    localStorage.removeItem('auth_token');
+
+    http.get('/api/protected').subscribe();
+
+    const req = httpMock.expectOne('/api/protected');
+    expect(req.request.headers.has('Authorization')).toBe(false);
+    req.flush({ ok: true });
+  })
+
+  afterEach(() => {
+    localStorage.removeItem('auth_token');
+  });
+
 });

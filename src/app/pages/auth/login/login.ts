@@ -2,21 +2,19 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { 
-  LucideAngularModule, 
-  WalletCards, 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  ArrowRight 
-} from 'lucide-angular';
-import { AuthService } from '../../../core/services/auth.service/auth.service';
+import {
+  LucideMail,
+  LucideLock,
+  LucideEye,
+  LucideEyeOff,
+  LucideArrowRight
+} from '@lucide/angular';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, LucideMail, LucideLock, LucideEye, LucideEyeOff, LucideArrowRight],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -28,14 +26,6 @@ export class LoginComponent {
   showPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
-
-  // Icon Lucide
-  readonly WalletIcon = WalletCards;
-  readonly MailIcon = Mail;
-  readonly LockIcon = Lock;
-  readonly EyeIcon = Eye;
-  readonly EyeOffIcon = EyeOff;
-  readonly ArrowRightIcon = ArrowRight;
 
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -121,7 +111,7 @@ onSubmit(): void {
         this.router.navigate(['/admin']);
       }
     },
-    error: (err) => {
+    error: (err: any) => {
       this.isLoading.set(false);
       this.errorMessage.set(err.error?.message || 'Login gagal. Cek username dan password.');
     }

@@ -2,13 +2,12 @@ import { Component, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { 
-  LucideAngularModule, 
-  Settings, 
-  Bell, 
-  ChevronRight,
-  User
-} from 'lucide-angular';
+import {
+  LucideSettings,
+  LucideBell,
+  LucideChevronRight,
+  LucideUser
+} from '@lucide/angular';
 
 export interface UserProfile {
   name: string;
@@ -19,15 +18,11 @@ export interface UserProfile {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideSettings, LucideBell, LucideChevronRight, LucideUser],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class NavbarComponent implements OnInit {
-  readonly SettingsIcon = Settings;
-  readonly BellIcon = Bell;
-  readonly ChevronRightIcon = ChevronRight;
-  readonly UserIcon = User;
 
   currentPath = signal<string>('');
 
