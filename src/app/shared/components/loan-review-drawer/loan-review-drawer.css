@@ -1,0 +1,78 @@
+@reference "../../../../styles.css";
+
+/* ================================================== */
+/* REVIEW DRAWER — shared/components/loan-review-drawer */
+/* ================================================== */
+
+.drawer-backdrop {
+  @apply fixed inset-0 z-40;
+  background-color: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.drawer-panel {
+  @apply fixed top-0 right-0 h-full w-full sm:w-[420px] z-50 flex flex-col border-l;
+  background-color: rgba(15, 23, 42, 0.98);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: -10px 0 40px -10px rgba(0, 0, 0, 0.6);
+}
+
+.drawer-header {
+  @apply px-6 py-5 border-b flex items-center justify-between;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.drawer-title {
+  @apply text-sm font-bold text-white;
+}
+
+.drawer-close-btn {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer;
+}
+
+.drawer-body {
+  @apply flex-1 overflow-y-auto px-6 py-5 space-y-5;
+}
+
+.drawer-field-label {
+  @apply text-[11px] uppercase tracking-wide text-slate-400 font-semibold mb-1;
+}
+
+.drawer-field-value {
+  @apply text-sm text-slate-100 font-medium;
+}
+
+.drawer-divider {
+  @apply border-t;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.drawer-actions {
+  @apply px-6 py-5 border-t flex flex-col gap-2.5;
+  border-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(2, 6, 23, 0.4);
+}
+
+/* Tombol approve — reuse gradient emerald dari login button */
+.btn-approve {
+  @apply w-full py-2.5 px-4 font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer text-slate-950;
+  background: linear-gradient(135deg, #6EE7B7 0%, #10B981 100%);
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.4);
+}
+.btn-approve:hover { @apply scale-[1.01] brightness-105; }
+
+/* Tombol reject — outline merah, kontras sama approve */
+.btn-reject {
+  @apply w-full py-2.5 px-4 font-bold text-xs rounded-xl border transition-all duration-200 cursor-pointer;
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.4);
+  background-color: rgba(248, 113, 113, 0.06);
+}
+.btn-reject:hover { background-color: rgba(248, 113, 113, 0.12); }
+
+/* Tombol disburse — khusus back office, emerald solid tanpa gradient */
+.btn-disburse {
+  @apply w-full py-2.5 px-4 font-bold text-xs rounded-xl transition-all duration-200 cursor-pointer text-white;
+  background-color: #047857;
+}
+.btn-disburse:hover { background-color: #10B981; }

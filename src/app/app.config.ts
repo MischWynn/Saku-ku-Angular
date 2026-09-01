@@ -1,15 +1,18 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
-
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
+import { authInterceptor } from '../app/core/interceptors/auth.interceptor/auth.interceptor';
+import { provideCharts, withDefaultRegisterables  } from 'ng2-charts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(),
-    provideBrowserGlobalErrorListeners(),
-    provideRouter(routes, withInMemoryScrolling({ 
-      anchorScrolling: 'enabled', 
-      scrollPositionRestoration: 'enabled' }))
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideCharts(withDefaultRegisterables()),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([authInterceptor])
+    )
   ]
 };

@@ -4,7 +4,7 @@
     <div class="breadcrumb-container">
     <span class="breadcrumb-section">{{ breadcrumb().section }}</span>
     <span class="breadcrumb-separator">
-        <lucide-icon [img]="ChevronRightIcon" class="w-3.5 h-3.5"></lucide-icon>
+        <svg lucideChevronRight class="w-3.5 h-3.5"></svg>
     </span>
     <span class="breadcrumb-page">{{ breadcrumb().page }}</span>
     </div>
@@ -14,12 +14,12 @@
     
     <!-- Settings Button (Pengganti Search) -->
     <button type="button" class="action-btn" title="Settings">
-      <lucide-icon [img]="SettingsIcon" class="w-4 h-4"></lucide-icon>
+      <svg lucideSettings class="w-4 h-4"></svg>
     </button>
 
     <!-- Notification Button with Red Dot Badge -->
     <button type="button" class="action-btn relative" title="Notifications">
-      <lucide-icon [img]="BellIcon" class="w-4 h-4"></lucide-icon>
+      <svg lucideBell class="w-4 h-4"></svg>
       @if (hasNotification()) {
         <span class="notification-badge"></span>
       }
@@ -34,7 +34,7 @@
         @if (userProfile().avatarUrl) {
           <img [src]="userProfile().avatarUrl" alt="Avatar" class="avatar-img" />
         } @else {
-          <lucide-icon [img]="UserIcon" class="w-4 h-4 text-slate-400"></lucide-icon>
+          <svg lucideUser class="w-4 h-4 text-slate-400"></svg>
         }
       </div>
 

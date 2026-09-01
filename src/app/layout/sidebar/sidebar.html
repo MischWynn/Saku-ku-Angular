@@ -34,7 +34,7 @@
                 routerLinkActive="active" 
                 class="nav-item-link"
               >
-                <lucide-icon [img]="item.icon" class="nav-icon"></lucide-icon>
+                <svg [lucideIcon]="item.icon" class="nav-icon"></svg>
                 <span class="nav-text">{{ item.title }}</span>
               </a>
             </li>
@@ -57,7 +57,7 @@
     }
 
     <button type="button" (click)="logout()" class="btn-logout-glass">
-      <lucide-icon [img]="LogOutIcon" class="w-4 h-4"></lucide-icon>
+      <svg lucideLogOut class="w-4 h-4"></svg>
       <span>Keluar Sistem</span>
     </button>
   </div>

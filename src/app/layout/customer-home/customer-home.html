@@ -3,6 +3,10 @@
 <!-- Ambient Glow Background -->
   <div class="glow-spot-top"></div>
   <div class="glow-spot-bottom"></div>
+  <div class="dot-grid-overlay"></div>
+  <div class="mesh-blob mesh-blob-1"></div>
+  <div class="mesh-blob mesh-blob-2"></div>
+  <div class="mesh-blob mesh-blob-3"></div>
 
 <!-- Top Navigation Header -->
 <nav class="landing-nav">
@@ -18,7 +22,7 @@
       class="btn-nav-login"
     >
       <span>Masuk Staff</span>
-      <lucide-icon [img]="ArrowUpRightIcon" class="w-4 h-4"></lucide-icon>
+      <svg lucideArrowUpRight class="w-4 h-4"></svg>
     </button>
   </div>
 </nav>
@@ -76,15 +80,23 @@
       </div>
 
       <!-- Bottom Center: Hitung Simulasi (Cyan-Blue Pill) -->
-      <button type="button" class="badge-sticker badge-bottom-center">
+      <button 
+        type="button" 
+        (click)="scrollToSection('simulasi')" 
+        class="badge-sticker badge-bottom-center cursor-pointer"
+      >
         Hitung Simulasi Pinjaman &rarr;
       </button>
 
       <!-- Bottom Right: Ajukan Pinjaman (Dashed Emerald) -->
-      <button type="button" class="badge-sticker badge-bottom-right">
+      <a 
+        href="https://play.google.com/store" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="badge-sticker badge-bottom-right inline-flex items-center text-center cursor-pointer no-underline"
+      >
         Ajukan Pinjaman Sekarang &rarr;
-      </button>
-
+      </a>
 
       <!-- SVG Doodles & Scribbles -->
 
@@ -123,8 +135,8 @@
 
 <!--  MENGAPA MEMILIH SAKU-KU (FITUR) -->
 
-<section id="fitur" class="section-container scroll-mt-36">
-  
+<section id="fitur" class="section-container">
+  <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
   <div class="section-header">
     <h2 class="section-title">Mengapa Memilih Saku-ku?</h2>
     <p class="section-subtitle">
@@ -137,7 +149,7 @@
     <!-- Fitur 1: Proses Kilat -->
     <div class="feature-card group">
       <div class="feature-icon-box">
-        <lucide-icon [img]="ClockIcon" class="w-5 h-5 text-[#6EE7B7]"></lucide-icon>
+        <svg lucideClock class="w-5 h-5 text-[#6EE7B7]"></svg>
       </div>
       <h3 class="feature-title">Proses Kilat</h3>
       <p class="feature-desc">
@@ -148,7 +160,7 @@
     <!-- Fitur 2: Keamanan Terjamin -->
     <div class="feature-card group">
       <div class="feature-icon-box">
-        <lucide-icon [img]="ShieldIcon" class="w-5 h-5 text-[#10B981]"></lucide-icon>
+        <svg lucideShieldCheck class="w-5 h-5 text-[#10B981]"></svg>
       </div>
       <h3 class="feature-title">Keamanan Terjamin</h3>
       <p class="feature-desc">
@@ -159,7 +171,7 @@
     <!-- Fitur 3: Bunga Kompetitif -->
     <div class="feature-card group">
       <div class="feature-icon-box">
-        <lucide-icon [img]="PercentIcon" class="w-5 h-5 text-[#6EE7B7]"></lucide-icon>
+        <svg lucidePercent class="w-5 h-5 text-[#6EE7B7]"></svg>
       </div>
       <h3 class="feature-title">Bunga Kompetitif</h3>
       <p class="feature-desc">
@@ -170,7 +182,7 @@
     <!-- Fitur 4: Tanpa Jaminan -->
     <div class="feature-card group">
       <div class="feature-icon-box">
-        <lucide-icon [img]="HandCoinsIcon" class="w-5 h-5 text-[#10B981]"></lucide-icon>
+        <svg lucideHandCoins class="w-5 h-5 text-[#10B981]"></svg>
       </div>
       <h3 class="feature-title">Tanpa Jaminan</h3>
       <p class="feature-desc">
@@ -185,7 +197,7 @@
 <!-- CARA KERJA (WORKFLOW 4 LANGKAH) -->
 
 <section id="cara-kerja" class="section-container scroll-mt-36">
-  
+  <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
   <div class="section-header">
     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/10 border border-[#10B981]/30 mb-3">
       <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
@@ -203,7 +215,7 @@
     <div class="step-card">
       <span class="step-number">01</span>
       <div class="step-icon-wrapper">
-        <lucide-icon [img]="UserPlusIcon" class="w-5 h-5 text-[#6EE7B7]"></lucide-icon>
+        <svg lucideUserPlus class="w-5 h-5 text-[#6EE7B7]"></svg>
       </div>
       <h3 class="step-title">Registrasi Akun</h3>
       <p class="step-desc">
@@ -215,7 +227,7 @@
     <div class="step-card">
       <span class="step-number">02</span>
       <div class="step-icon-wrapper">
-        <lucide-icon [img]="FileTextIcon" class="w-5 h-5 text-[#10B981]"></lucide-icon>
+        <svg lucideFileText class="w-5 h-5 text-[#10B981]"></svg>
       </div>
       <h3 class="step-title">Ajukan Pinjaman</h3>
       <p class="step-desc">
@@ -227,7 +239,7 @@
     <div class="step-card">
       <span class="step-number">03</span>
       <div class="step-icon-wrapper">
-        <lucide-icon [img]="SearchCheckIcon" class="w-5 h-5 text-[#6EE7B7]"></lucide-icon>
+        <svg lucideSearchCheck class="w-5 h-5 text-[#6EE7B7]"></svg>
       </div>
       <h3 class="step-title">Review & Verifikasi</h3>
       <p class="step-desc">
@@ -239,7 +251,7 @@
     <div class="step-card">
       <span class="step-number">04</span>
       <div class="step-icon-wrapper">
-        <lucide-icon [img]="WalletCardsIcon" class="w-5 h-5 text-[#10B981]"></lucide-icon>
+        <svg lucideWalletCards class="w-5 h-5 text-[#10B981]"></svg>
       </div>
       <h3 class="step-title">Pencairan Dana</h3>
       <p class="step-desc">
@@ -253,8 +265,8 @@
 
 <!-- STRUKTUR TARIF TRANSPARAN (BUNGA & TENOR) -->
 
-<section id="tarif" class="section-container scroll-mt-36">
-  
+<section id="tarif" class="section-container">
+  <div class="section-glow section-glow-emerald" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
   <div class="section-header">
     <h2 class="section-title">Produk Suku Bunga</h2>
     <p class="section-subtitle">
@@ -268,7 +280,7 @@
       <!-- 6 Bulan -->
       <div class="rate-item-box">
         <span class="rate-tenor">6 BULAN</span>
-        <h4 class="rate-value">5.0%</h4>
+        <h4 class="rate-value">3.0%</h4>
         <span class="rate-label">Bunga Efektif per tahun</span>
       </div>
 
@@ -304,44 +316,48 @@
 </section>
 
 <!-- SIMULASI KREDIT -->
+<section id="simulasi" class="section-container">
+  <div class="section-header">
+    <span class="hero-badge">Simulasi Instan</span>
+    <h2 class="section-title">Hitung Estimasi Pinjaman</h2>
+    <p class="section-subtitle">
+      Sesuaikan nominal dan jangka waktu tenor sesuai kebutuhan finansial Anda dengan transparansi bunga terbaik.
+    </p>
+  </div>
 
+  <!-- Samakan dengan lebar container atas -->
+  <div class="w-full max-w-6xl mx-auto">
+    <app-loan-simulation></app-loan-simulation>
+  </div>
+</section>
 
 <!--  BILLBOARDS CTA BANNER SECTION -->
 
 <section class="billboard-section">
-  <div class="billboard-container">
-    
-    <!-- Background Billboard Image -->
-    <img 
-      src="assets/Billboards.png" 
-      alt="Saku-ku Billboard" 
-      class="billboard-bg-img"
-    />
-    <div class="billboard-overlay"></div>
-
-    <!-- Floating Glass Banner Content -->
-    <div class="billboard-content-card">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/15 border border-[#10B981]/30 mb-3">
+  <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
+  <div class="billboard-split-container">
+    <div class="billboard-text-side">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/15 border border-[#10B981]/30 mb-3 w-fit">
         <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
         Ekspansi Finansial Terpercaya
       </div>
-
       <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug">
         Siap Mewujudkan Rencana Finansial Anda?
       </h2>
-      
-      <p class="text-xs sm:text-sm text-slate-300 mt-2 max-w-xl">
+      <p class="text-xs sm:text-sm text-slate-300 mt-2 max-w-md">
         Dapatkan akses pendanaan transparan dengan bunga kompetitif, proses kilat, dan proteksi enkripsi standar perbankan.
       </p>
-
       <div class="mt-6 flex flex-wrap items-center gap-4">
-        <a routerLink="/login" class="btn-billboard-cta">
+        <a href="https://play.google.com/store" target="_blank" rel="noopener noreferrer" class="btn-billboard-cta">
           <span>Mulai Pengajuan Sekarang</span>
           <span class="w-5 h-5 rounded-full bg-slate-950/20 flex items-center justify-center font-bold text-xs">&rarr;</span>
         </a>
       </div>
     </div>
-
+    <div class="billboard-visual-side">
+      <img src="assets/Billboards.png" alt="Saku-ku Billboard" class="billboard-visual-img" />
+      <div class="billboard-visual-tint"></div>
+    </div>
   </div>
 </section>
 
