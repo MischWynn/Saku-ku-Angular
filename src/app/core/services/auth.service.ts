@@ -1,19 +1,26 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { LoginRequestDTO, AuthResponseDTO } from '../models/auth.dto/auth.dto';
-import { apicall } from '../../../util/apicall';
+import { LoginRequestDTO, AuthResponseDTO, ForgotPasswordRequest, ResetPasswordRequest } from '../models/auth.dto/auth.dto';
 import { environment } from '../../../environments/environment';
 import { ApiService } from './api.service';
+import { ApiResponse } from '../../shared/models/api-response';
+import { toSidebarRole } from '../../shared/config/role.config';
+import { RoleMenuAccess } from '../../shared/models/role-menu.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface UserProfileResponse {
+  namaLengkap: string;
+  roleName: string; // nilai mentah dari backend, mis. 'MARKETING' / 'BM' / 'SUPERADMIN'
+}
 
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly api = inject(ApiService);
   private readonly apiUrl = `${environment.apiUrl}/user`;
   private readonly tokenKey = 'auth_token';
+
+  readonly currentUser = signal<UserProfileResponse | null>(null);
+  // Akses menu (Master Access) buat role user yang lagi login — sumber data sidebar dinamis.
+  readonly myMenuAccess = signal<RoleMenuAccess[]>([]);
 
   login(payload: LoginRequestDTO): Observable<AuthResponseDTO> {
     return this.api.post<AuthResponseDTO>(`${this.apiUrl}/login`, payload).pipe(
@@ -23,6 +30,40 @@ export class AuthService {
         }
       })
     );
+  }
+
+  fetchCurrentUser(): Observable<ApiResponse<UserProfileResponse>> {
+    return this.api.get<ApiResponse<UserProfileResponse>>(`${this.apiUrl}/me`).pipe(
+      tap((res) => {
+        this.currentUser.set(res.data ?? null);
+        if (res.data?.roleName) {
+          // simpen versi 'sidebar-friendly' (lowercase, 'branchmanager') buat sidebar filtering
+          localStorage.setItem('userRole', toSidebarRole(res.data.roleName));
+        }
+      })
+    );
+  }
+
+  fetchMyMenuAccess(): Observable<ApiResponse<RoleMenuAccess[]>> {
+    return this.api.get<ApiResponse<RoleMenuAccess[]>>(`${environment.apiUrl}/role-menu/me`).pipe(
+      tap((res) => this.myMenuAccess.set(res.data ?? []))
+    );
+  }
+
+  updateOwnProfile(payload: { namaLengkap?: string; email?: string }): Observable<ApiResponse<unknown>> {
+    return this.api.patch<ApiResponse<unknown>>(`${this.apiUrl}/me`, payload);
+  }
+
+  changePassword(payload: { oldPassword: string; newPassword: string }): Observable<ApiResponse<null>> {
+    return this.api.patch<ApiResponse<null>>(`${this.apiUrl}/change-password`, payload);
+  }
+
+  forgotPassword(payload: ForgotPasswordRequest): Observable<ApiResponse<string>> {
+    return this.api.post<ApiResponse<string>>(`${this.apiUrl}/forgot-password`, payload);
+  }
+
+  resetPassword(payload: ResetPasswordRequest): Observable<ApiResponse<null>> {
+    return this.api.post<ApiResponse<null>>(`${this.apiUrl}/reset-password`, payload);
   }
 
   getToken(): string | null {
@@ -35,44 +76,8 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem('userRole');
+    this.currentUser.set(null);
+    this.myMenuAccess.set([]);
   }
 }
-
-// export class AuthService {
-//   private http = inject(HttpClient);
-//   private apiUrl = `${environment.apiUrl}/users`;
-
-//      login(payload: { email: string; password: string }): Observable<any> {
-//     return this.http.post<any>(`${this.apiUrl}/login`, payload, {
-//       withCredentials: true 
-//     });
-//   }
-  // login(payload: { email: string; password: string }): any {
-  //   return apicall.call(this, 'POST', `${this.apiUrl}/login`, {}, payload);
-  // }
-// }
-
-//   private tokenKey = 'auth_token';
-
-//   login(payload: LoginRequestDTO): Observable<AuthResponseDTO> {
-//     return this.http.post<AuthResponseDTO>(`${this.apiUrl}/login`, payload).pipe(
-//       tap(res => {
-//         if (res.token) {
-//           localStorage.setItem(this.tokenKey, res.token);
-//         }
-//       })
-//     );
-//   }
-
-//   getToken(): string | null {
-//     return localStorage.getItem(this.tokenKey);
-//   }
-
-//   isLoggedIn(): boolean {
-//     return !!this.getToken();
-//   }
-
-//   logout(): void {
-//     localStorage.removeItem(this.tokenKey);
-//   }
-// }

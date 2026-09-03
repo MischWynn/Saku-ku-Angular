@@ -14,6 +14,7 @@ import { ROLE_REVIEW_CONFIG } from '../../config/review-action.config';
 export class LoanReviewDrawerComponent {
   readonly item = input<LoanApplication | null>(null);
   readonly role = input<UserRole>('MARKETING');
+  readonly submitting = input<boolean>(false);
 
   readonly close = output<void>();
   readonly actionSubmit = output<ReviewActionPayload>();
@@ -26,6 +27,7 @@ export class LoanReviewDrawerComponent {
   );
 
   onAction(action: 'APPROVE' | 'REJECT'): void {
+    if (this.submitting()) return;
     const current = this.item();
     if (!current) return;
     this.actionSubmit.emit({ appId: current.appId, action, notes: this.noteInput });

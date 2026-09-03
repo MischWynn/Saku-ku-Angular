@@ -13,7 +13,7 @@
   <div class="navbar-actions">
     
     <!-- Settings Button (Pengganti Search) -->
-    <button type="button" class="action-btn" title="Settings">
+    <button type="button" routerLink="/settings" class="action-btn" title="Settings">
       <svg lucideSettings class="w-4 h-4"></svg>
     </button>
 
@@ -31,12 +31,15 @@
     <!-- Staff Profile Card -->
     <div class="profile-card">
       <div class="avatar-box">
+      <svg lucideUser class="w-4 h-4 text-slate-400"></svg>
+    </div>
+      <!-- <div class="avatar-box">
         @if (userProfile().avatarUrl) {
           <img [src]="userProfile().avatarUrl" alt="Avatar" class="avatar-img" />
         } @else {
           <svg lucideUser class="w-4 h-4 text-slate-400"></svg>
         }
-      </div>
+      </div> -->
 
       <div class="profile-info">
         <span class="staff-name">{{ userProfile().name }}</span>

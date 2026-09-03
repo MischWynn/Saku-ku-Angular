@@ -8,26 +8,17 @@ import { ApiResponse } from '../../../shared/models/api-response';
 import { DashboardSummary, ReviewActivity } from '../../../shared/models/dashboard-summary';
 import { STATUS_BADGE_STYLES } from '../../../shared/config/status-badge.config';
 import { LoanStatus } from '../../../shared/models/loan-application';
-import { ACTIVITY_ICON_CONFIG, DEFAULT_ACTIVITY_ICON } from '../../../shared/config/activity-icon.config';
-import { LucideDynamicIcon } from '@lucide/angular';
+import { ActivityFeedComponent } from '../../../shared/components/activity-feed/activity-feed';
 
 @Component({
   selector: 'app-overview',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, LucideDynamicIcon],
+  imports: [CommonModule, BaseChartDirective, ActivityFeedComponent],
   templateUrl: './overview.html',
   styleUrl: './overview.css',
 })
 
 export class Overview {
-
-protected activityIcon(activity: ReviewActivity) {
-  return ACTIVITY_ICON_CONFIG[activity.action] ?? DEFAULT_ACTIVITY_ICON;
-}
-
-protected shortId(idPengajuan: string): string {
-  return `#${idPengajuan.substring(0, 8).toUpperCase()}`;
-}
 
   private readonly apiUrl = `${environment.apiUrl}/dashboard/superadmin`;
 
@@ -95,11 +86,6 @@ protected shortId(idPengajuan: string): string {
 
   protected formatRupiah(value: number): string {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value);
-  }
-
-  protected formatActivityMessage(activity: ReviewActivity): string {
-    const nominal = this.formatRupiah(activity.pengajuan.nominalPengajuan);
-    return `${activity.user.namaLengkap} — ${activity.action} pengajuan senilai ${nominal}`;
   }
 }
 

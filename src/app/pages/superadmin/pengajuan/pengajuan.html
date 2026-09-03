@@ -1,1 +1,54 @@
-<p>pengajuan works!</p>
+<div class="relative h-full flex gap-4">
+
+  <div class="flex-1 min-w-0 flex flex-col gap-4 h-full">
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">List Request Pinjaman</h1>
+        <p class="text-sm text-slate-400 mt-1">Semua pengajuan yang masuk, lintas status &mdash; monitoring aja, approval tetap wewenang Marketing/BM/Backoffice.</p>
+      </div>
+
+      <select
+        [value]="statusFilter()"
+        (change)="onFilterChange($any($event.target).value)"
+        class="px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-slate-200 focus:outline-none focus:border-emerald-400/50">
+        <option value="ALL">Semua Status</option>
+        @for (status of statusOptions; track status) {
+          <option [value]="status">{{ statusBadge[status].label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="flex-1 min-h-0">
+      @if (isLoading()) {
+        <div class="h-full flex items-center justify-center rounded-3xl bg-slate-900/40 border border-white/8">
+          <span class="text-slate-400 text-sm animate-pulse">Memuat data pengajuan...</span>
+        </div>
+      } @else if (hasError()) {
+        <div class="h-full flex items-center justify-center rounded-3xl bg-slate-900/40 border border-white/8">
+          <span class="text-red-300 text-sm">Gagal memuat data pengajuan. Silakan coba lagi.</span>
+        </div>
+      } @else {
+        <app-loan-queue-list
+          title="List Request Pinjaman"
+          [subtitle]="items().length + ' pengajuan ditemukan'"
+          [items]="items()"
+          [selectedId]="selectedId()"
+          (selectItem)="selectItem($event)" />
+      }
+    </div>
+
+  </div>
+
+  @if (selectedItem(); as selected) {
+    <div class="fixed inset-0 z-40 p-4 bg-slate-950/95 backdrop-blur-sm
+                sm:static sm:z-auto sm:p-0 sm:bg-transparent sm:backdrop-blur-none
+                sm:w-[420px] shrink-0">
+      <app-loan-review-drawer
+        [item]="selected"
+        role="SUPERADMIN"
+        (close)="closeDrawer()" />
+    </div>
+  }
+
+</div>

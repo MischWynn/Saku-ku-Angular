@@ -1,0 +1,18 @@
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+  <div class="rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/8 p-4">
+    <span class="text-[11px] text-slate-400 uppercase tracking-wide font-medium">Menunggu Review</span>
+    <div class="text-2xl font-bold text-white mt-1">{{ totalCount() }}</div>
+  </div>
+
+  <div class="rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/8 p-4 min-w-0">
+    <span class="text-[11px] text-slate-400 uppercase tracking-wide font-medium">Total Nominal Diajukan</span>
+    <div class="text-2xl font-bold text-emerald-300 mt-1 truncate">Rp {{ totalAmount() | number:'1.0-0' }}</div>
+  </div>
+
+  <div class="rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/8 p-4 min-w-0">
+    <span class="text-[11px] text-slate-400 uppercase tracking-wide font-medium">Rata-rata Nominal</span>
+    <div class="text-2xl font-bold text-white mt-1 truncate">Rp {{ avgAmount() | number:'1.0-0' }}</div>
+  </div>
+
+</div>

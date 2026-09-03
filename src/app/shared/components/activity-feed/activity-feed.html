@@ -1,0 +1,28 @@
+<div class="space-y-5">
+  @for (activity of activities(); track activity.id) {
+    <div class="flex items-start gap-4">
+      <div [class]="activityIcon(activity).iconBg"
+           class="w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+        <svg [lucideIcon]="activityIcon(activity).icon"
+             [class]="'w-[18px] h-[18px] ' + activityIcon(activity).iconColor"></svg>
+      </div>
+      <div class="flex-1 min-w-0">
+        <h4 class="text-sm font-bold text-white">{{ activityIcon(activity).title }}</h4>
+        <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+          Pengajuan {{ shortId(activity.pengajuan.id) }} oleh
+          <span class="font-semibold text-slate-200">{{ activity.pengajuan.customer.namaLengkap }}</span>
+          @if (activity.action === 'DISBURSE') {
+            telah dicairkan sebesar
+            <span class="font-semibold text-emerald-400">{{ formatRupiah(activity.pengajuan.nominalPengajuan) }}</span>
+          } @else {
+            senilai
+            <span class="font-semibold text-emerald-400">{{ formatRupiah(activity.pengajuan.nominalPengajuan) }}</span>
+          }
+        </p>
+        <p class="text-[11px] text-slate-500 mt-1.5">{{ activity.createdAt | date: 'dd MMM, HH:mm' }}</p>
+      </div>
+    </div>
+  } @empty {
+    <p class="text-xs text-slate-500">{{ emptyMessage() }}</p>
+  }
+</div>

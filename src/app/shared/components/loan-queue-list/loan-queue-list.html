@@ -1,53 +1,53 @@
-<div class="h-full flex flex-col rounded-3xl bg-emerald-900/30 backdrop-blur-xl border border-emerald-500/20 shadow-2xl p-5 overflow-hidden">
+<div class="h-full flex flex-col rounded-3xl bg-slate-900/40 backdrop-blur-xl border border-white/8 shadow-2xl p-5 overflow-hidden">
 
   <div class="mb-4">
     <h2 class="text-xl font-bold text-white tracking-wide">{{ title() }}</h2>
-    <p class="text-xs text-emerald-300/70 mt-0.5">{{ subtitle() }}</p>
+    <p class="text-xs text-slate-400 mt-0.5">{{ subtitle() }}</p>
   </div>
 
-  <div class="space-y-3 overflow-y-auto flex-1 pr-1.5 scrollbar-thin scrollbar-thumb-emerald-700/50">
+  <div class="space-y-2.5 overflow-y-auto flex-1 pr-1.5 scrollbar-thin scrollbar-thumb-slate-700/50">
     @for (item of items(); track item.id) {
       <div
         (click)="selectItem.emit(item)"
         [class]="selectedId() === item.id
-          ? 'bg-emerald-800/50 border-emerald-400/50 shadow-lg shadow-emerald-950/50'
-          : 'bg-emerald-950/40 border-emerald-500/10'"
-        class="group cursor-pointer p-4 rounded-2xl border backdrop-blur-md transition-all duration-200 hover:border-emerald-400/40 hover:bg-emerald-900/40 hover:scale-[1.01]">
+          ? 'bg-slate-700/60 border-emerald-400/40 shadow-lg shadow-black/30'
+          : 'bg-slate-800/55 border-white/8'"
+        class="group cursor-pointer flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3.5 rounded-2xl border backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-slate-700/50">
 
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-emerald-700/30 border border-emerald-400/30 flex items-center justify-center font-bold text-emerald-200 text-xs shadow-inner">
-              {{ item.applicant.name.substring(0, 2).toUpperCase() }}
-            </div>
-            <div>
-              <h4 class="font-semibold text-emerald-50 text-sm group-hover:text-emerald-300 transition-colors">
-                {{ item.applicant.name }}
-              </h4>
-              <span class="text-[11px] text-emerald-400/70 font-mono tracking-wider">ID: {{ item.appId }}</span>
-            </div>
+        <!-- Baris 1 (selalu): avatar + nama + ID -->
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <div class="w-10 h-10 shrink-0 rounded-full bg-slate-600/40 border border-white/10 flex items-center justify-center font-bold text-slate-200 text-xs">
+            {{ item.applicant.name.substring(0, 2).toUpperCase() }}
           </div>
-
-          <div class="text-right">
-            <div class="font-bold text-emerald-300 text-sm">
-              Rp {{ item.loan.requestedAmount | number:'1.0-0' }}
-            </div>
-            <div class="text-[10px] text-emerald-300/60 mt-0.5 font-medium">
-              {{ item.loan.category }} • {{ item.loan.tenorMonths }} Bln
-            </div>
+          <div class="min-w-0 flex-1">
+            <h4 class="font-semibold text-slate-100 text-sm truncate group-hover:text-emerald-300 transition-colors">
+              {{ item.applicant.name }}
+            </h4>
+            <span class="text-[11px] text-slate-500 font-mono tracking-wider">ID: ...{{ item.appId.slice(-8) }}</span>
           </div>
         </div>
 
-        <div class="flex justify-end">
+        <!-- Baris 2 di mobile / sisi kanan di desktop: nominal + badge, selalu bareng -->
+        <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0">
+          <div class="text-left sm:text-right">
+            <div class="font-bold text-slate-100 text-sm whitespace-nowrap">
+              Rp {{ item.loan.requestedAmount | number:'1.0-0' }}
+            </div>
+            <div class="text-[10px] text-slate-500 mt-0.5 font-medium whitespace-nowrap">
+              {{ item.loan.category }} • {{ item.loan.tenorMonths }} Bln
+            </div>
+          </div>
+
           <span
             [class]="statusBadge[item.status].classes"
-            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border">
+            class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap">
             {{ statusBadge[item.status].label }}
           </span>
         </div>
 
       </div>
     } @empty {
-      <div class="flex flex-col items-center justify-center py-16 text-emerald-400/50 text-xs gap-2">
+      <div class="flex flex-col items-center justify-center py-16 text-slate-500 text-xs gap-2">
         <span class="text-2xl">📭</span>
         <p>Tidak ada pengajuan di antrean ini</p>
       </div>

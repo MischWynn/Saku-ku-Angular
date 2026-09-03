@@ -1,4 +1,4 @@
-export type UserRole = 'MARKETING' | 'BM' | 'BACK_OFFICE';
+export type UserRole = 'MARKETING' | 'BM' | 'BACK_OFFICE' | 'SUPERADMIN';
 export type EmploymentType = 'KARYAWAN' | 'WIRASWASTA' | 'LAINNYA';
 export type LoanStatus =
   | 'MARKETING_REVIEW'

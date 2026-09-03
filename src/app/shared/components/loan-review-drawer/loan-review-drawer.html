@@ -8,7 +8,8 @@
       </div>
       <button
         (click)="close.emit()"
-        class="w-8 h-8 rounded-full bg-emerald-950/60 border border-emerald-500/20 flex items-center justify-center text-emerald-300 hover:text-white hover:bg-emerald-800/50 transition-all">
+        [disabled]="submitting()"
+        class="w-8 h-8 rounded-full bg-emerald-950/60 border border-emerald-500/20 flex items-center justify-center text-emerald-300 hover:text-white hover:bg-emerald-800/50 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
         ✕
       </button>
     </div>
@@ -28,7 +29,11 @@
         <div class="grid grid-cols-2 gap-3 text-xs pt-2 border-t border-emerald-800/30">
           <div>
             <span class="text-emerald-400/60 block mb-0.5">Date of Birth</span>
-            <p class="text-emerald-100 font-medium">{{ app.applicant.dob }} ({{ app.applicant.age }} yrs)</p>
+            @if (app.applicant.dob) {
+              <p class="text-emerald-100 font-medium">{{ app.applicant.dob }} ({{ app.applicant.age }} yrs)</p>
+            } @else {
+              <p class="text-emerald-100/40 font-medium italic">Belum tersedia</p>
+            }
           </div>
           <div>
             <span class="text-emerald-400/60 block mb-0.5">Phone Number</span>
@@ -45,24 +50,28 @@
         <h5 class="text-xs font-semibold text-emerald-300 mb-3 flex items-center gap-2">
           <span>💼</span> Employment & Financial
         </h5>
-        <div class="grid grid-cols-2 gap-3 text-xs">
-          <div>
-            <span class="text-emerald-400/60 block mb-0.5">Occupation</span>
-            <p class="text-emerald-100 font-medium">{{ app.applicant.occupation }}</p>
+        @if (app.applicant.occupation) {
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <span class="text-emerald-400/60 block mb-0.5">Occupation</span>
+              <p class="text-emerald-100 font-medium">{{ app.applicant.occupation }}</p>
+            </div>
+            <div>
+              <span class="text-emerald-400/60 block mb-0.5">{{ employmentLabel() }}</span>
+              <p class="text-emerald-100 font-medium">{{ app.applicant.employmentLengthMonths }} bulan</p>
+            </div>
+            <div>
+              <span class="text-emerald-400/60 block mb-0.5">Monthly Income</span>
+              <p class="text-emerald-400 font-bold text-sm">Rp {{ app.applicant.monthlyIncome | number }}</p>
+            </div>
+            <div>
+              <span class="text-emerald-400/60 block mb-0.5">Existing Debts</span>
+              <p class="text-rose-400 font-bold text-sm">Rp {{ app.applicant.existingDebts | number }} /bln</p>
+            </div>
           </div>
-          <div>
-            <span class="text-emerald-400/60 block mb-0.5">{{ employmentLabel() }}</span>
-            <p class="text-emerald-100 font-medium">{{ app.applicant.employmentLengthMonths }} bulan</p>
-          </div>
-          <div>
-            <span class="text-emerald-400/60 block mb-0.5">Monthly Income</span>
-            <p class="text-emerald-400 font-bold text-sm">Rp {{ app.applicant.monthlyIncome | number }}</p>
-          </div>
-          <div>
-            <span class="text-emerald-400/60 block mb-0.5">Existing Debts</span>
-            <p class="text-rose-400 font-bold text-sm">Rp {{ app.applicant.existingDebts | number }} /bln</p>
-          </div>
-        </div>
+        } @else {
+          <p class="text-emerald-100/40 text-xs italic">Data pekerjaan & finansial belum tersedia — menunggu pelengkapan data nasabah.</p>
+        }
       </div>
 
       <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-900/60 to-emerald-950/80 border border-emerald-500/25 shadow-lg">
@@ -74,9 +83,11 @@
             <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400/70">Requested Amount</span>
             <p class="text-2xl font-black text-white tracking-tight">Rp {{ app.loan.requestedAmount | number }}</p>
           </div>
-          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-800/70 border border-emerald-400/30 text-emerald-200">
-            {{ app.loan.category }}
-          </span>
+          @if (app.loan.category) {
+            <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-800/70 border border-emerald-400/30 text-emerald-200">
+              {{ app.loan.category }}
+            </span>
+          }
         </div>
         <div class="grid grid-cols-3 gap-2 text-center pt-3 border-t border-emerald-800/40 text-xs">
           <div>
@@ -89,47 +100,43 @@
           </div>
           <div>
             <span class="text-emerald-400/60 block mb-0.5">Est. Installment</span>
-            <p class="font-bold text-emerald-300">Rp {{ app.loan.estInstallment | number }}</p>
+            @if (app.loan.estInstallment) {
+              <p class="font-bold text-emerald-300">Rp {{ app.loan.estInstallment | number }}</p>
+            } @else {
+              <p class="font-bold text-emerald-100/40 italic text-[11px]">Belum dihitung</p>
+            }
           </div>
         </div>
       </div>
 
-      <div>
-        <label class="block text-xs font-semibold text-emerald-300 mb-1.5">{{ config().notesLabel }}</label>
-        <textarea
-          [(ngModel)]="noteInput"
-          rows="3"
-          [placeholder]="config().notesPlaceholder"
-          class="w-full text-xs text-emerald-100 placeholder-emerald-400/40 bg-emerald-950/60 border border-emerald-500/20 rounded-2xl p-3 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition-all"></textarea>
-      </div>
+      @if (config().actions.length > 0) {
+        <div>
+          <label class="block text-xs font-semibold text-emerald-300 mb-1.5">{{ config().notesLabel }}</label>
+          <textarea
+            [(ngModel)]="noteInput"
+            rows="3"
+            [placeholder]="config().notesPlaceholder"
+            class="w-full text-xs text-emerald-100 placeholder-emerald-400/40 bg-emerald-950/60 border border-emerald-500/20 rounded-2xl p-3 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400 transition-all"></textarea>
+        </div>
+      }
 
     </div>
 
-    <!-- <div class="grid grid-cols-2 gap-3 pt-4 border-t border-emerald-500/20">
+@if (config().actions.length > 0) {
+  <div [class]="config().actions.length > 1 ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-3'"
+       class="pt-4 border-t border-emerald-500/20">
+    @for (action of config().actions; track action.type) {
       <button
-        (click)="onAction('REJECT')"
-        class="py-3 px-4 rounded-xl text-xs font-bold text-rose-300 bg-rose-950/30 border border-rose-500/30 hover:bg-rose-900/50 hover:border-rose-400 transition-all duration-200 flex items-center justify-center gap-1.5 shadow-sm">
-        <span>🚫</span> {{ config().rejectText }}
+        (click)="onAction(action.type)"
+        [disabled]="submitting()"
+        [class]="action.style === 'danger'
+          ? 'py-3 px-4 rounded-xl text-xs font-bold text-rose-300 bg-rose-950/30 border border-rose-500/30 hover:bg-rose-900/50 hover:border-rose-400 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed'
+          : 'py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-400 border border-emerald-300/30 shadow-lg shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed'">
+        {{ submitting() ? 'Memproses...' : action.label }}
       </button>
-      <button
-        (click)="onAction('APPROVE')"
-        class="py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-400 border border-emerald-300/30 shadow-lg shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-200 flex items-center justify-center gap-1.5">
-        <span>{{ config().approveText }}</span> ➔
-      </button>
-    </div> -->
-
-<div [class]="config().actions.length > 1 ? 'grid grid-cols-2 gap-3' : 'grid grid-cols-1 gap-3'"
-     class="pt-4 border-t border-emerald-500/20">
-  @for (action of config().actions; track action.type) {
-    <button
-      (click)="onAction(action.type)"
-      [class]="action.style === 'danger'
-        ? 'py-3 px-4 rounded-xl text-xs font-bold text-rose-300 bg-rose-950/30 border border-rose-500/30 hover:bg-rose-900/50 hover:border-rose-400 transition-all duration-200'
-        : 'py-3 px-4 rounded-xl text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-400 border border-emerald-300/30 shadow-lg shadow-emerald-950/50 hover:shadow-emerald-500/30 transition-all duration-200'">
-      {{ action.label }}
-    </button>
-  }
-</div>
+    }
+  </div>
+}
 
   </div>
 }
