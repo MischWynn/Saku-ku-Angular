@@ -18,37 +18,15 @@
 }
 
 /* Navbar */
-.landing-nav {
-  @apply w-full max-w-7xl mx-auto pt-6 px-6 sm:px-8 flex items-center justify-between relative z-30 pointer-events-auto;
-}
-
-.brand-group {
-  @apply flex items-center gap-3 h-11;
-}
-
-.brand-logo-mask {
-  @apply w-7 h-7 inline-block;
-  background-color: #10B981; /* Warna hijau emerald yang kamu inginkan */
-  -webkit-mask: url('/assets/wallet-logo.svg') no-repeat center / contain;
-  mask: url('/assets/wallet-logo.svg') no-repeat center / contain;
-  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5));
-}
-
-.brand-logo-img {
-  @apply w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(16,185,129,0.5)];
-}
-
-.brand-name {
-  @apply text-lg font-bold text-white tracking-tight;
-}
-
-.btn-nav-login {
-  @apply relative z-30 h-11 flex items-center gap-2 px-4 rounded-full text-xs sm:text-sm font-semibold text-white bg-white/[0.08] border border-white/15 hover:bg-[#10B981]/20 hover:border-[#10B981]/50 transition-all duration-200 cursor-pointer backdrop-blur-md shrink-0;
-}
+/* 4 Sept 2026: brand row ("Saku-ku" logo + wordmark, dulu di sini di bawah pill nav) DIHAPUS
+   total — user minta gak ada logo terpisah lagi, pill nav (.dynamic-island, fixed top-6) sudah
+   cukup jadi satu-satunya elemen nav. Karena landing-nav row yang dulu ngasih clearance (pt-24)
+   udah gak ada, clearance-nya dipindah jadi tanggung jawab .hero-section langsung (lihat pt-24
+   di bawah) biar konten pertama tetap gak ketiban pill nav yang fixed itu. */
 
 /* Hero Section */
 .hero-section {
-  @apply w-full max-w-6xl mx-auto px-4 pt-16 sm:pt-20 pb-20 flex flex-col items-center text-center relative z-20;
+  @apply w-full max-w-6xl mx-auto px-4 pt-24 sm:pt-28 pb-20 flex flex-col items-center text-center relative z-20;
 }
 
 .hero-header-text {
@@ -76,13 +54,17 @@
 }
 
 /* Showcase Stage with Ample Height */
+/* Mobile height dinaikin 580->660 (4 Sept), sekarang naik lagi dikit ke 700/720/760
+   (4 Sept, lanjutan) — imbangin phone yang 10% lebih besar. */
 .showcase-stage {
-  @apply relative w-full max-w-5xl min-h-[580px] sm:min-h-[680px] lg:min-h-[740px] flex items-center justify-center mt-2;
+  @apply relative w-full max-w-5xl min-h-[700px] sm:min-h-[720px] lg:min-h-[760px] flex items-center justify-center mt-2;
 }
 
 /* Central Phone Image (Ukuran Besar & Dominan) */
+/* Mobile dinaikin dikit 320px->336px (4 Sept), sekarang semua breakpoint naik lagi ~10%
+   sesuai request user (4 Sept, lanjutan): 336->368, 420->462, 480->528, 540->594. */
 .phone-wrapper {
-  @apply relative z-10 w-80 sm:w-[420px] md:w-[480px] lg:w-[540px] transition-transform duration-500 ease-out;
+  @apply relative z-10 w-[23rem] sm:w-[462px] md:w-[528px] lg:w-[594px] transition-transform duration-500 ease-out;
 }
 
 .phone-wrapper:hover {
@@ -94,8 +76,9 @@
 }
 
 /* Base Sticker Styling (z-index 20 untuk overlapping di atas HP) */
+/* Mobile text dinaikin xs->sm (4 Sept 2026) biar lebih kebaca, sesuai request "sedikit lebih besar" */
 .badge-sticker {
-  @apply absolute z-20 text-xs sm:text-sm font-extrabold transition-all duration-200 cursor-pointer select-none backdrop-blur-md;
+  @apply absolute z-20 text-sm font-extrabold transition-all duration-200 cursor-pointer select-none backdrop-blur-md;
 }
 
 .badge-sticker:hover {
@@ -104,43 +87,55 @@
 }
 
 /* 1. Yellow Lemon Sticker (Overlapping di kiri atas bezel HP) */
+/* Mobile band 1/6 — gap antar band di-lebarin (4 Sept 2026) biar aman dari collision di device manapun */
 .badge-top-left {
-  @apply top-10 sm:top-14 left-4 sm:left-12 lg:left-24 px-4 py-2.5 rounded-xl -rotate-6 shadow-xl;
+  @apply top-2 sm:top-14 left-4 sm:left-12 lg:left-24 px-4 py-2.5 rounded-xl -rotate-6 shadow-xl;
   background-color: #fef08a;
   color: #713f12;
   border: 2px solid #eab308;
 }
 
 /* 2. Emerald Gradient Pill (Overlapping di kanan atas layar HP) */
+/* Mobile band 2/6 */
 .badge-top-right {
-  @apply top-8 sm:top-12 right-4 sm:right-14 lg:right-24 px-5 py-3 rounded-full text-slate-950 rotate-6 shadow-2xl;
+  @apply top-36 sm:top-12 right-4 sm:right-14 lg:right-24 px-5 py-3 rounded-full text-slate-950 rotate-6 shadow-2xl;
   background: linear-gradient(135deg, #6EE7B7 0%, #10B981 100%);
   box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
 }
 
-/* 3. Mint 3D Badge (Overlapping di pinggang kanan HP) */
+/* 3. Mint 3D Badge (Overlapping di pinggang kanan HP) — band 3/6, tengah */
 .badge-mid-right {
-  @apply top-1/2 -translate-y-6 right-2 sm:right-10 lg:right-16 px-4 py-2.5 rounded-xl text-slate-950 -rotate-3 shadow-lg;
+  @apply top-1/2 -translate-y-8 right-2 sm:right-10 lg:right-16 px-4 py-2.5 rounded-xl text-slate-950 -rotate-3 shadow-lg;
   background-color: #6EE7B7;
   box-shadow: 0 5px 0 #047857;
 }
 
-/* 4. Dark Emerald Solid Pill (Overlapping di sisi kiri tangan/bawah HP) */
+/* 4. Dark Emerald Solid Pill (Overlapping di sisi kiri tangan/bawah HP) — band 4/6 */
 .badge-bottom-left {
-  @apply bottom-28 sm:bottom-32 left-2 sm:left-10 lg:left-20 px-4 py-2.5 rounded-xl text-xs tracking-wider uppercase text-white rotate-3 border shadow-2xl;
+  @apply bottom-56 sm:bottom-32 left-2 sm:left-10 lg:left-20 px-4 py-2.5 rounded-xl tracking-wider uppercase text-white rotate-3 border shadow-2xl;
   background-color: #064e3b;
   border-color: #10B981;
 }
 
-/* 5. Teal/Blue Cyan Pill (Overlapping menimpa bagian bawah tangan) */
+/* 5. Teal/Blue Cyan Pill — mobile: band 5/6 bawah-tengah (unchanged, udah aman).
+   4 Sept lanjutan: BUG ketemu — di sm/lg badge ini (bottom-anchored, center-relative via
+   sm:left-1/3) berbagi band vertikal yang sama kayak badge-bottom-left (fixed left offset),
+   dan begitu 3 badge (bl/bc/br, masing2 ~210-245px lebar) berebut 1 baris horizontal di stage
+   selebar 640-1024px, gap-nya abis — collision beneran (bukan cuma di layar tanggung, kejadian
+   di SEMUA lebar ≥640px, konsisten, diverifikasi lewat getBoundingClientRect pairwise check di
+   700/900/1200px). Fix: di sm+ badge ini pindah jadi "mid-left" (top:50% -translate-y-8, cermin
+   badge-mid-right di sisi kanan) — band vertikal ini udah kebukti aman (gak collide sama
+   top-row maupun bottom-row manapun), jadi gak perlu lagi rebutan tempat sama bl/br. */
 .badge-bottom-center {
-  @apply bottom-10 left-1/3 -translate-x-1/4 sm:-translate-x-1/2 px-5 py-2.5 rounded-xl text-slate-950 font-bold italic -rotate-3 shadow-xl z-20;
+  @apply bottom-28 left-1/2 -translate-x-1/2
+    sm:bottom-auto sm:top-1/2 sm:-translate-y-8 sm:translate-x-0 sm:left-2 lg:left-10
+    px-5 py-2.5 rounded-xl text-slate-950 font-bold italic -rotate-3 shadow-xl z-20;
   background-color: #38bdf8;
 }
 
-/* 6. Green Dashed Pill (Overlapping di kanan bawah tangan) */
+/* 6. Green Dashed Pill (Overlapping di kanan bawah tangan) — band 6/6, paling bawah */
 .badge-bottom-right {
-  @apply bottom-14 right-4 sm:right-14 lg:right-24 px-5 py-3 rounded-2xl rotate-6 shadow-2xl z-20;
+  @apply bottom-4 sm:bottom-14 right-4 sm:right-14 lg:right-24 px-5 py-3 rounded-2xl rotate-6 shadow-2xl z-20;
   background-color: #10B981;
   border: 2px dashed #022c22;
   color: #022c22;
@@ -187,6 +182,15 @@
   animation: drift-a 26s ease-in-out infinite reverse;
 }
 
+/* 4 Sept 2026, lanjutan: blob ke-4 — isi "gap" ambient light di sekitar area tarif/simulasi
+   (~55-65% tinggi halaman), yang sebelumnya cuma dapet section-glow lokal doang, gak ada
+   mesh-blob besar di dekat situ (blob-2 ada di ~30%, blob-3 di ~90%). */
+.mesh-blob-4 {
+  @apply top-[58%] right-[8%] w-[420px] h-[420px] opacity-[0.14];
+  background: radial-gradient(circle, #6EE7B7, transparent 70%);
+  animation: drift-b 24s ease-in-out infinite reverse;
+}
+
 @keyframes drift-a {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(40px, -30px) scale(1.08); }
@@ -201,9 +205,43 @@
   .mesh-blob { animation: none; }
 }
 
+/* ------------------------------------------------ */
+/* SCROLL REVEAL — fade+slide-up sekali pas section masuk viewport pertama kali.       */
+/* Progressive enhancement: default `.reveal` cuma dapet style hidden-nya di DALAM     */
+/* `@media (prefers-reduced-motion: no-preference)`, jadi kalau user prefer reduced    */
+/* motion, elemen render normal/visible dari awal — gak pernah nyambung ke JS/         */
+/* IntersectionObserver sama sekali (lihat setupScrollReveal() di customer-home.ts).   */
+/* ------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Stagger kartu di dalam grid (feature-card/step-card) biar cascade masuk satu-satu,
+     bukan muncul barengan sekaligus. Selector scoped ke `.grid > .reveal` jadi otomatis
+     kepakai di fitur & cara-kerja tanpa perlu class tambahan per kartu. */
+  .grid > .reveal:nth-child(1) { transition-delay: 0ms; }
+  .grid > .reveal:nth-child(2) { transition-delay: 90ms; }
+  .grid > .reveal:nth-child(3) { transition-delay: 180ms; }
+  .grid > .reveal:nth-child(4) { transition-delay: 270ms; }
+}
+
+
+/* 4 Sept 2026, lanjutan: bug ketemu pas audit dekorator — section ini gak punya `relative`,
+   jadi `.section-glow` child-nya (position:absolute) escape ke ancestor positioned TERDEKAT
+   (`.landing-container`, di paling atas) alih-alih ke section ini sendiri. Efeknya glow yang
+   niatnya nempel di billboard (~80% tinggi halaman) malah muncul di ~25% tinggi halaman (dekat
+   fitur/cara-kerja), bikin bagian bawah halaman keliatan "kosong kiri, numpuk kanan" pas
+   dicek sebaran kiri-kanan-nya. Ditambahin `relative` biar glow-nya nempel lokal ke section ini. */
 .billboard-section {
-  @apply w-full max-w-6xl mx-auto px-4 sm:px-6 my-16 select-none;
+  @apply relative w-full max-w-6xl mx-auto px-4 sm:px-6 my-16 select-none;
 }
 
 .billboard-split-container {
@@ -214,6 +252,18 @@
 
 .billboard-text-side {
   @apply relative z-10 flex flex-col justify-center p-8 sm:p-12;
+}
+
+/* 4 Sept 2026: class ini dipakai di HTML tapi gak pernah ada rule-nya sama sekali —
+   tombol jadi gak ke-style (teks + panah arrow ke-wrap ke baris terpisah, gak ada pill/bg). */
+.btn-billboard-cta {
+  @apply inline-flex items-center gap-2 w-fit px-6 py-3 rounded-full text-sm font-bold text-slate-950 shadow-lg transition-all duration-200 cursor-pointer no-underline;
+  background-color: #10B981;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+}
+
+.btn-billboard-cta:hover {
+  background-color: #6EE7B7;
 }
 
 .billboard-visual-side {

@@ -39,6 +39,25 @@ Project ini dikerjain dari 2 device (kadang via Claude chat, kadang Claude Code 
 
 ---
 
+## 🚨 Jangan Sentuh Production/DB Shared Langsung
+
+DB Postgres (`129.226.195.9:5432/binar_finance`) itu **remote, infra shared Binar Academy** — perlakukan kayak production, BUKAN DB lokal buang-buang.
+
+**JANGAN, tanpa konfirmasi eksplisit ke user dulu:**
+- Jalanin raw `INSERT`/`UPDATE`/`DELETE`/`ALTER TABLE`/`DROP` langsung (via psql, script DBeaver, atau client DB manapun)
+- Seeding/ubah data massal dengan nulis file SQL terus dieksekusi sendiri
+- Ngelakuin aksi yang beneran ubah state (approve/reject/disburse pengajuan, hapus akun staff, dst) cuma buat "testing" tanpa bilang ke user dulu — walau ke data dummy/seed, soalnya itu data shared yang mungkin lagi dipakai testing/demo orang lain juga
+
+**Jalur yang lebih aman (urutan preferensi):**
+1. **Perubahan skema**: tambah/ubah field di JPA `@Entity`, biarin `spring.jpa.hibernate.ddl-auto=update` yang auto-`ALTER TABLE` pas backend restart — gak perlu SQL manual. Pola ini udah kebukti aman & dipakai buat `tujuan_pinjaman` (3 Sept 2026).
+2. **Perubahan data/config** (menu baru, akses role-menu, akun staff, dst): lewat UI/API aplikasi sendiri — user yang isi manual lewat Master Data pages (pola yang udah established buat seeding Master Menu/Access), atau Claude yang eksekusi via API terautentikasi **dan WAJIB laporin detail semua write yang dilakuin** biar user bisa cross-check.
+3. **Baca data (`GET`)** selalu aman, gak perlu konfirmasi.
+4. Kalau kepepet butuh 1 aksi state-changing beneran buat diagnosis bug (mis. test endpoint approve), bilang eksplisit dulu ke user, dan hindari pas user lagi aktif pakai data yang sama di sesi mereka sendiri.
+
+**Kenapa**: ini infra shared yang mungkin dipantau/dipakai mentor atau device lain. Write tanpa bilang bisa ngerusak state demo/testing orang lain, dan raw SQL skip validasi + audit-trail logic aplikasi (`ReviewLogService`, notifikasi trigger) yang otomatis kejaga kalau lewat jalur ORM/API.
+
+---
+
 ## Backend
 
 ### Auth & RBAC — solid, sudah diverifikasi lengkap
@@ -153,12 +172,15 @@ src/app/
 ├── app.ts, app.routes.ts, app.config.ts, app.html, app.css
 ```
 
-**⚠️ File duplikat/legacy yang ditandai — belum dihapus, verify dulu sama user sebelum delete (destructive change butuh konfirmasi):**
-- `shared/config/review-log.config.ts` (versi lama `ROLE_REVIEW_CONFIG` sudah digantikan `review-action.config.ts`) — kalau sudah dihapus, hapus baris ini
-- `models/dashboard-summary.ts` vs `shared/models/dashboard-summary.ts`
-- `util/apicall.ts` vs `core/services/api.service.ts`
-- `core/services/loan-queue.ts`, `core/service.ts` — empty stubs
-- `features/*` — seluruh folder, superseded total
+**✅ File duplikat/legacy — SUDAH DIHAPUS (4 Sept 2026)**, diverifikasi dulu (grep referensi ke seluruh `src/`) sebelum dihapus, gak ada satupun yang ternyata masih dipakai:
+- `models/dashboard-summary.ts` + `dashboard-summary.spec.ts` (duplikat kosong, semua tempat asli udah pakai `shared/models/dashboard-summary.ts`)
+- `src/util/apicall.ts` (bukan `app/util/`, di luar `app/` — overlap sama `core/services/api.service.ts`, gak pernah diimport)
+- `core/services/loan-queue.ts` + `.spec.ts`, `core/service.ts` + `.spec.ts` — empty stub `@Injectable` class, gak pernah diimport
+- `shared/models/pengajuan.model.ts` — 1 baris `export class Pengajuan {}`, ada comment dev sendiri "katanya ini ga kepakeee. mau diganti pengajuan-api.model.ts" — udah dikonfirmasi bener gak kepake
+- `features/*` — seluruh folder (`backoffice/bo-queue`, `branch-manager/bm-queue`, `marketing/marketing-queue`), termasuk `marketing-queue.spec.ts` yang selama ini jadi salah satu dari 7 test file failing ("No test suite found") — sekalian ilang begitu foldernya dihapus
+- `shared/config/review-log.config.ts` — pas dicek ternyata **udah gak ada** (mungkin kehapus di sesi sebelumnya), gak perlu dihapus lagi
+
+Diverifikasi: `tsc --noEmit` (app + spec) clean setelah hapus semua ini, dan full test suite jalan bersih — file count turun 41→35, failing count turun 7→5 (7 pre-existing failure sebelumnya, 2 di antaranya — `marketing-queue.spec.ts` yang emang "No test suite found" — ikut hilang bareng foldernya). 5 sisanya (`app.spec.ts`, `auth.guards.spec.ts`, `customer-home.spec.ts`, `dashboard-layout.spec.ts`, `overview.spec.ts`) tetap pre-existing/gak kesentuh, sesuai daftar yang udah didokumentasikan — bukan regresi baru.
 
 **Pola berulang yang perlu diinget**: kalau nemu error TS aneh soal property tidak ada di interface padahal kodenya kelihatan benar, **cek dulu ada file duplikat dengan isi beda** sebelum debug lebih jauh — ini sudah kejadian berkali-kali.
 
@@ -221,7 +243,7 @@ protected readonly items = computed(
   () => (this.queueResource.value()?.data ?? []).map(mapApiPengajuanToLoanApplication)
 );
 ```
-Field yang belum ada di backend (dob, age, employmentType, occupation, employmentLengthMonths, monthlyIncome, existingDebts, loan.category, loan.estInstallment) diisi placeholder kosong/0 di mapper, ditandai TODO. **Begitu migration dieksekusi**: update `ApiPengajuan` interface + isi mapper dengan field asli, komponen UI (queue-list, drawer) TIDAK perlu diubah lagi.
+Field yang tadinya belum ada di backend (dob, age, employmentType, occupation, employmentLengthMonths, monthlyIncome, existingDebts, loan.category) tadinya diisi placeholder kosong/0 di mapper. **✅ Update 3 Sept 2026: SEMUA field ini sekarang udah diisi data asli** (migration `tujuan_pinjaman` + migration field `tbl_customer`, keduanya selesai) — persis kayak yang diprediksi di sini, komponen UI (queue-list, drawer) emang TIDAK perlu diubah sama sekali, cuma mapper yang diupdate. Tinggal `loan.estInstallment` yang masih placeholder `0` (belum dihitung backend di mana pun).
 
 **Pelajaran**: kalau Claude Code (device manapun) desain interface "mengantisipasi masa depan" tanpa ngecek response API asli dulu, gampang lolos compile tapi meledak di runtime. Selalu cross-check `LoanApplication`-family model terhadap response JSON asli sebelum dipakai di `httpResource`.
 
@@ -523,7 +545,7 @@ Catatan penting biar gak salah paham lagi: `RoleHierarchy` (`SUPERADMIN implies 
 
 **🐛 Gotcha testing (device manapun, kalau perlu manual-trigger service dari browser console buat debugging)**: nge-timpa `window.fetch` manual dari luar app (buat mocking pas testing) bikin function itu jadi **gak zone-patched** — `NgZone` gak pernah tau ada task async yang selesai, jadi CD gak ke-trigger walau signal-nya sendiri udah bener-bener keupdate (`comp.filteredMenuGroups()` manggil langsung kebukti benar, tapi DOM/screenshot gak keliatan berubah). Ini murni artifact cara testing (monkey-patch `fetch` di console), BUKAN bug beneran — di app asli, `fetch` tetep zone-patched normal dari awal render, jadi CD jalan seperti biasa.
 
-**🚨 Batasan yang masih ada — belum dikerjain sesi ini**: sidebar sekarang udah nyembunyiin item yang gak diizinkan, TAPI **route guard belum ngecek permission per-menu**. Kalau staff Marketing tau/nebak URL `/admin/staff` langsung dari address bar, `roleGuard(['superadmin'])` di route itu tetep nolak dia (guard per-role masih jalan seperti biasa) — jadi itu AMAN. Yang belum kesync itu skenario yang lebih halus: staff dalam role yang SAMA tapi di-uncheck akses ke 1 menu spesifik lewat Master Access (misal Marketing tapi `canView=false` buat Review Pinjaman) — staff itu tetap bisa buka `/marketing/review-pinjaman` langsung via URL walau sidebar-nya udah nyembunyiin link itu, karena `roleGuard(['marketing'])` di route itu cuma cek role, bukan cek `canView` per-menu. Kalau butuh proteksi level itu, perlu guard baru (`menuAccessGuard`) yang baca `myMenuAccess` — belum dibangun, next task kalau user minta.
+**✅ Batasan ini SUDAH DIBERESIN (3 Sept 2026)**: dulu sidebar nyembunyiin item yang gak diizinkan tapi route guard belum ngecek permission per-menu (skenario: staff Marketing di-uncheck akses ke Review Pinjaman lewat Master Access, tapi tetap bisa buka `/marketing/review-pinjaman` langsung via URL). Sekarang udah ada `menuAccessGuard()` yang nutup celah ini, dipasang bareng `roleGuard()` di tiap route yang terdaftar di Master Access. Lihat section "Sinkronisasi Master Access ke route guard" (3 Sept) buat detail implementasi + verifikasi live.
 
 **File yang berubah**: `RoleMenuController.java` (`+getMyAccess()`), `SecurityConfig.java` (+rule `/role-menu/me`), `auth.service.ts` (+`myMenuAccess` signal, `+fetchMyMenuAccess()`), `app.ts` (ngOnInit fetch), `login.ts` (fetch abis login sukses), `sidebar.ts` (`filteredMenuGroups` baca data, bukan hardcode lagi).
 
@@ -545,7 +567,37 @@ Frontend: `AuthService.changePassword()`, card "Ganti Kata Sandi" di `pages/sett
 
 **Scope note**: ini CUMA bagian `tujuan_pinjaman` dari migration yang lebih besar. Field-field `tbl_customer` (`tanggal_lahir`, `tipe_pekerjaan`, `pekerjaan`, `lama_bekerja_bulan`, `pendapatan_bulanan`, `utang_berjalan`) di `sakuku-migration-customer-pengajuan-fields.sql` **masih belum dikerjain** — user sengaja minta fokus `tujuan_pinjaman` dulu. Kalau lanjut ke field customer itu, pendekatannya sama (tambah field ke `CustomerEntity`, manfaatin `ddl-auto=update`), bukan raw SQL.
 
-### 🆕 [3 Sept 2026] Riwayat Review Saya — ✅ backend + frontend selesai, ⏳ nunggu seeding Master Menu/Access biar sidebar-nya muncul
+### 🐛 [3 Sept 2026] BM approve selalu gagal — bug LAMA, TIDAK terkait migration `tujuan_pinjaman` — ✅ FIXED
+
+User laporan: masuk sebagai BM, gak bisa approve pengajuan sama sekali. Sempat curiga ini efek samping dari perubahan `tujuan_pinjaman`/field customer sesi ini — **dicek, TIDAK terkait**. Root cause murni di `review-queue.base.ts` (`onActionSubmit`), kode yang udah ada dari sesi-sesi sebelumnya, gak pernah kesentuh sesi ini sampai baru ketauan sekarang:
+
+1. **BM approve selalu gagal**: `PengajuanService.bmApprove()` (backend) WAJIB `nominalDisetujui` diisi (`"Nominal disetujui wajib diisi"` kalau kosong), tapi frontend `onActionSubmit()` **cuma pernah ngirim `catatan`, gak pernah ngirim `nominalDisetujui` sama sekali** — drawer-nya juga emang gak punya input field buat ini dari awal. Jadi BM approve 100% pasti gagal setiap kali dicoba, bukan cuma kadang-kadang.
+2. **Bug kedua yang ketauan bareng**: reject (Marketing/BM) ngirim body key `alasan`, padahal `PengajuanReviewRequest` (backend) cuma punya field `catatan` — jadi field `alasan` diabein Jackson (unknown field), dan catatan/alasan reject **selalu null tersimpan di DB**, walau reject-nya sendiri sukses (gak keliatan error di FE, makanya gak ketauan dari awal).
+
+**Fix**:
+- `loan-review-drawer.ts`/`.html` — tambah input "Nominal Disetujui" (numeric), **muncul cuma buat role BM**, prefill ke `loan.requestedAmount`, validasi client-side gak boleh lebih besar dari nominal pengajuan (tombol Approve ke-disable kalau invalid, backend tetap validasi ulang di server). `ReviewActionPayload` (`loan-application.ts`) +field `nominalDisetujui?: number`.
+- `review-queue.base.ts` `onActionSubmit()` — body sekarang selalu `{ catatan: ... }` (approve MAUPUN reject, sesuai field asli backend), plus `nominalDisetujui` di-attach kalau action APPROVE dan nilainya ada. Error handler juga diupdate nyoba nampilin `err.error?.message` asli dari backend (sebelumnya generic "Gagal memproses pengajuan" doang — bikin bug kayak gini nyaris gak kelihatan penyebabnya dari UI).
+- `tsc --noEmit` clean. **Diverifikasi user langsung**: approve BM udah jalan sekarang.
+
+### 🆕 [3 Sept 2026] 2 gap ketauan pas user testing BM approve — udah dikerjain bareng
+
+User nanya 2 hal abis approve BM jalan: (1) catatan dari role sebelumnya keliatan gak pas role berikutnya review, (2) notifikasi navbar kok belum jalan. Keduanya ternyata gap nyata, bukan cuma pertanyaan — langsung dikerjain:
+
+**1. Riwayat review antar-role — dulu gak pernah ditampilin, sekarang muncul di drawer**: `GET /api/v1/pengajuan/{id}/history` udah lama ada di backend (dipakai buat apa aja gak jelas sebelumnya — ternyata emang gak pernah dipanggil dari FE manapun). Ditambahin ke `loan-review-drawer.ts` — `httpResource` baru (`historyResource`, fetch `/pengajuan/{itemId}/history`, entity `ReviewLogEntity` ternyata serialize identik sama shape `ReviewActivity` yang udah ada, jadi tinggal reuse tipe itu, gak perlu bikin model baru) + section baru "📝 Riwayat Review" di `loan-review-drawer.html` pakai `<app-activity-feed>` yang sama kayak Riwayat Review Saya/Aktivitas Terbaru. Muncul buat SEMUA role (termasuk superadmin view-only) — sifatnya informational, bukan aksi. Gak perlu perubahan backend (endpoint udah ada, `SecurityConfig` udah cover lewat wildcard `GET /api/v1/pengajuan/**`).
+
+**2. Notifikasi navbar disambungin ke data real**: `navbar.ts` `hasNotification` yang tadinya hardcode `signal(true)` (ada TODO comment nunjuk ke endpoint yang sekarang udah ada) sekarang `httpResource` ke `/review-log/me` (endpoint yang sama persis kayak Riwayat Review Saya) → titik merah cuma nyala kalau ada review yang staff itu lakuin dalam 24 jam terakhir. Sesuai rencana awal sesi ini: sengaja skip read/unread state beneran (butuh nyimpen "terakhir dilihat kapan" per user — enhancement kalau diminta nanti), MVP-nya cukup dot indicator.
+
+**🐛 Regresi kecil ketauan pas jalanin test suite penuh**: nambahin `httpResource` ke `navbar.ts` bikin `navbar.spec.ts` (test yang sebelumnya UDAH pass) jadi timeout — `beforeEach` hang nunggu `whenStable()` karena gak ada `HttpClient` di DI (`NullInjectorError` kalau gak ada provider, atau pending request nge-block stabilitas zona kalau providernya ada tapi requestnya gak pernah di-flush). **Fixed**: `navbar.spec.ts` ditambah `provideHttpClient()`+`provideHttpClientTesting()` + `httpMock.expectOne(...).flush({data:[]})` sebelum `whenStable()`, pola persis sama kayak `pengajuan.spec.ts`. Diverifikasi: `navbar.spec.ts` pass sendirian. **Full suite run juga sempet ngecek 6 file lain yang emang UDAH gagal dari sebelumnya** (`app.spec.ts`, `auth.guards.spec.ts`, `customer-home.spec.ts`, `dashboard-layout.spec.ts`, `overview.spec.ts`, `marketing-queue.spec.ts` di folder `features/` legacy) — dicross-check `git status` semua file itu **gak ada yang kesentuh sesi ini**, jadi itu pre-existing/udah didokumentasikan sebelumnya (lihat section Testing di bawah), bukan regresi baru. Sengaja gak diapa-apain lebih lanjut sesuai instruksi user (UT ditunda).
+
+### 🆕 [3 Sept 2026] 3 temuan dari testing marketing approve — 1 fixed, 1 investigated (bukan bug kode), 1 diverifikasi
+
+**1. Catatan gak muncul di Riwayat Review — bug nyata, FIXED**: `ActivityFeedComponent` (`activity-feed.html`) dari awal cuma nampilin action/nominal/timestamp, **`activity.catatan` (notes) gak pernah dirender sama sekali** — padahal field-nya udah ada di model `ReviewActivity` dari awal. Ditambahin blok kutipan (`"{{ activity.catatan }}"`) yang muncul kalau ada isinya. Karena `ActivityFeedComponent` dipakai bareng di 3 tempat (Aktivitas Terbaru superadmin, Riwayat Review Saya, drawer Riwayat Review baru), fix ini otomatis kepakai di ketiganya sekaligus. Diverifikasi visual lewat browser — catatan muncul dengan benar di drawer maupun halaman Riwayat Review Saya.
+
+**2. Marketing approve "Forbidden" — DICEK LANGSUNG, backend-nya kebukti benar; kemungkinan besar bukan bug kode**: Ditest langsung: `PATCH /api/v1/pengajuan/{id}/marketing-approve` dipanggil pakai token superadmin (yang lewat `RoleHierarchy` otomatis dapet akses MARKETING juga) — **hasilnya 200 OK, sukses**, `SecurityConfig` rule dan `PengajuanService.marketingApprove()` kebukti jalan normal, gak ada regresi dari perubahan sesi ini. Karena gak megang kredensial akun marketing asli (`dewi.marketing`/`rizki.marketing`/`marketing01`), gak bisa reproduksi "Forbidden"-nya persis dari sisi staff beneran. Role data di DB juga dicek bersih (semua `namaRole` persis `"MARKETING"`, gak ada whitespace/typo). **Dugaan kuat**: token JWT expired/stale di sesi browser yang lagi dipakai (`app.security.jwt-ttl-minutes` — cek nilainya di `application.properties` kalau mau tau berapa lama), ATAU salah akun yang lagi login. **Saran buat user**: logout dulu, login ulang fresh sebagai marketing, retry. Kalau masih gagal, buka Network tab pas klik Approve, screenshot/salin response BODY-nya (bukan cuma status "403 Forbidden" di kolom status) — field `"message"` di situ bakal kasih tau alasan pastinya.
+
+**3. Responsif — diverifikasi visual mobile (375px, iPhone-size) buat semua halaman yang diubah sesi ini**: List Request Pinjaman (list + drawer + section Riwayat Review baru + input Nominal Disetujui) dan Riwayat Review Saya — semua render bersih, teks wrap dengan benar (App ID panjang, catatan panjang), gak ada horizontal overflow, navbar compact mode + notification dot tetep jalan normal. Konsisten sama pola mobile-first yang udah established dari redesign 2 Sept.
+
+### 🆕 [3 Sept 2026] Riwayat Review Saya — ✅ SELESAI, seeding + sidebar verified live
 
 **Backend**: `GET /api/v1/review-log/me` (`ReviewLogController`, baru) — resolve user login dari `SecurityContextHolder` (pola sama kayak `/user/me` dan `/role-menu/me`), delegasi ke `ReviewLogService.getByUser(userId)` (method baru) → `ReviewLogRepository.findByUser_IdOrderByCreatedAtDesc()` (query method baru). Balikin `List<ReviewLogEntity>` mentah (pola sama kayak `getRecentActivity()` buat Aktivitas Terbaru superadmin — entity langsung, bukan DTO). `SecurityConfig` rule baru `hasAnyRole("MARKETING","BM","BACK_OFFICE")` — **superadmin sengaja TIDAK dikasih akses**, soalnya `cancelBySuperadmin()` di `PengajuanService` gak pernah manggil `reviewLogService.record()`, jadi riwayatnya bakal selalu kosong buat role itu.
 
@@ -553,13 +605,193 @@ Frontend: `AuthService.changePassword()`, card "Ganti Kata Sandi" di `pages/sett
 
 **Halaman baru**: 🆕 `pages/staff/riwayat-review/` (`.ts`/`.html`/`.css`) — **1 komponen dipakai bareng buat 3 role** (Marketing/BM/Backoffice), bukan 3 file terpisah kayak `review-pinjaman` — soalnya kontennya 100% identik (endpoint `/me` udah resolve identitas dari JWT sendiri, gak butuh config per-role apapun). Didaftarin di `app.routes.ts` 3x di 3 child-route berbeda (`/marketing/riwayat-review`, `/branchmanager/riwayat-review`, `/backoffice/riwayat-review`), masing-masing tetep di bawah `roleGuard` role-nya sendiri.
 
-**🚨 Belum kelar — sidebar-nya belum muncul sampai di-seed manual**: `sidebar-menu.config.ts` (`MENU_CONFIG`) udah ditambah 3 entry "Riwayat Review Saya" (icon `LucideHistory`), TAPI karena sidebar sekarang baca `myMenuAccess` (data live dari `tbl_role_menu`, lihat section "Sidebar dinamis" di atas) dan BUKAN fallback `roles` array lagi (staff yang udah login pasti `myMenuAccess` udah keisi, gak nge-trigger fallback), 3 route baru ini **gak bakal muncul di sidebar sampai** ada yang nambahin data ini lewat UI (user pilih ngerjain sendiri, bukan saya lewat browser otomatis):
-1. **Master Menu** — tambah 3 baris baru: nama `Riwayat Review Saya`, icon `LucideHistory`, path masing-masing persis: `/marketing/riwayat-review`, `/branchmanager/riwayat-review`, `/backoffice/riwayat-review` (parent kosong, urutan bebas)
-2. **Master Access** — buka role **MARKETING**, centang View di baris yang path-nya `/marketing/riwayat-review` (JANGAN yang path lain), simpan. Ulangi buat role **BM** → path `/branchmanager/riwayat-review`, dan **BACK_OFFICE** → path `/backoffice/riwayat-review`.
+**Seeding Master Menu/Access — dikerjain user manual lewat UI** (pola sama kayak seeding 9 menu awal), lalu diverifikasi lewat browser: `sidebar-menu.config.ts` (`MENU_CONFIG`) punya 3 entry "Riwayat Review Saya" (icon `LucideHistory`), dan `tbl_menu`/`tbl_role_menu` sekarang punya 3 baris menu baru dengan path persis (`/marketing/riwayat-review`, `/branchmanager/riwayat-review`, `/backoffice/riwayat-review`) + `canView=true` di masing-masing role yang bener (cross-check langsung lewat response `GET /api/v1/role-menu/role/{roleId}` per role — MARKETING/BM/BACK_OFFICE masing-masing cuma `canView:true` di path-nya sendiri, gak ada yang salah centang silang).
 
-Kalau langkah ini kelewat, halamannya tetap bisa diakses langsung lewat URL (route+guard-nya udah aktif dari kode), cuma link-nya gak nongol di sidebar.
+**Verifikasi sesi ini**: backend `mvn clean compile` sukses bersih. Frontend `tsc --noEmit` clean. **Diverifikasi live**: `GET /api/v1/review-log/me` reachable & balikin `ApiResponse` yang bener (`{"data":[],...,"statusCode":200}` — kosong pas dites pakai akun superadmin, expected karena `cancelBySuperadmin()` gak pernah manggil `reviewLogService.record()`). Catatan kecil: superadmin ternyata BISA manggil endpoint ini walau `SecurityConfig` rule-nya `hasAnyRole("MARKETING","BM","BACK_OFFICE")` doang — ini karena `RoleHierarchy` (SUPERADMIN implies MARKETING/BM/BACK_OFFICE) nambahin akses ke atas secara otomatis, bukan bug, konsisten sama perilaku yang udah didokumentasikan di section RoleHierarchy sebelumnya. Belum sempat login sebagai staff Marketing/BM/Backoffice beneran buat lihat entry sidebar-nya kepake (gak ada kredensial staff biasa di tangan, dan sengaja gak nebak-nebak password lagi) — user disaranin cek sendiri pas sempat.
 
-**Verifikasi sesi ini**: backend `mvn clean compile` sukses bersih. Frontend `tsc --noEmit` clean, gak ada error tipe. **Belum diverifikasi visual di browser** (koneksi browser tool sempat kedeny pas sesi ini) — next session/user disaranin buka salah satu route `riwayat-review` langsung lewat URL buat mastiin datanya kebaca bener dari endpoint baru.
+### 🆕 [3 Sept 2026] Migration field `tbl_customer` — ✅ SELESAI, verified live, no regression
+
+Lanjutan dari migration `tujuan_pinjaman` — 6 field baru ditambah ke `CustomerEntity`, semua nullable, pola eksekusi SAMA (JPA entity + `ddl-auto=update`, bukan raw SQL):
+
+```java
+private LocalDate tanggalLahir;       // kolom tanggal_lahir
+private String tipePekerjaan;         // kolom tipe_pekerjaan — KARYAWAN/WIRASWASTA/LAINNYA, plain String
+private String pekerjaan;             // kolom pekerjaan, teks bebas
+private Integer lamaBekerjaBulan;     // kolom lama_bekerja_bulan
+private BigDecimal pendapatanBulanan; // kolom pendapatan_bulanan
+private BigDecimal utangBerjalan;     // kolom utang_berjalan
+```
+
+**Juga diupdate** (biar konsisten, walau belum ada klien yang pakai): `CustomerRegisterRequest` (+6 field opsional, sama pola kayak `tujuanPinjaman` di `PengajuanRequest`), `CustomerAuthService.register()` (nyimpen field-field ini), `CustomerResponseDTO` (+6 field + mapping di `.from()`).
+
+**Frontend**: `ApiPengajuan.customer` (`pengajuan-api.model.ts`) +6 field, `mapApiPengajuanToLoanApplication()` diupdate — `applicant.dob/age/employmentType/occupation/employmentLengthMonths/monthlyIncome/existingDebts` sekarang baca data asli (`age` dihitung client-side dari `tanggalLahir` via helper `calculateAge()`), bukan hardcode placeholder lagi. **Nggak perlu ubah `loan-review-drawer.html`** — guard `@if (app.applicant.occupation)` yang udah ada dari awal otomatis nampilin/nyembunyiin section Employment & Financial tergantung ada-gaknya data, jadi begitu customer beneran punya `pekerjaan` terisi, section itu muncul sendiri.
+
+**Verifikasi**: backend `mvn clean compile` bersih. Frontend `tsc --noEmit` clean. **Diverifikasi live** — `GET /api/v1/pengajuan` (superadmin) balikin ke-6 field baru di object `customer` nested, semua `null` buat data lama (expected, belum ada klien yang ngirim). Dicek juga visual di drawer — DOB tetep nampilin "Belum tersedia", section Employment & Financial tetep ke-hide dengan benar, gak ada crash/regresi buat data yang masih null.
+
+**Scope note**: migration `sakuku-migration-customer-pengajuan-fields.sql` sekarang **udah selesai semua** (baik bagian `tbl_pengajuan.tujuan_pinjaman` maupun `tbl_customer` fields) — tapi keduanya dieksekusi lewat entity+`ddl-auto=update`, BUKAN dengan run file SQL itu. File SQL-nya bisa dianggap sudah gak relevan lagi buat dijalanin manual.
+
+### 🆕 [3 Sept 2026] Sinkronisasi Master Access ke route guard — ✅ SELESAI, verified live (termasuk enforcement beneran, bukan cuma sidebar)
+
+Lanjutan dari sidebar dinamis (3 Sept, lihat section di atas) — sekarang route-level enforcement juga baca `tbl_role_menu`, nutup gap yang udah lama didokumentasikan ("staff bisa buka halaman langsung lewat URL walau sidebar udah nyembunyiin link-nya").
+
+**3 dari 4 pertanyaan desain lama ternyata udah otomatis kejawab** lewat kerjaan sesi-sesi sebelumnya, jadi eksekusi kali ini lebih kecil dari perkiraan awal:
+- Seeding data — udah kelar (12 menu, dan role-menu rows per role)
+- Timing fetch — `AuthService.myMenuAccess` udah di-fetch di 2 titik (abis login, app bootstrap) dari sesi-sesi sebelumnya
+- Menu non-per-role (Overview dst) — udah didaftarin ke `tbl_menu` bareng yang lain waktu seeding awal
+
+**Yang beneran baru dikerjain sesi ini**:
+- `AuthService` — `hasFetchedMenuAccess` flag (private) + method baru `ensureMenuAccessLoaded()`: balikin cache (`myMenuAccess()`) kalau udah pernah fetch, atau trigger fetch dulu kalau belum (nutup race condition hard-refresh ke deep link — guard nunggu fetch selesai, bukan langsung nilai signal kosong). Direset di `logout()`.
+- `auth.guards.ts` — guard baru `menuAccessGuard()`: baca `state.url` (path tujuan navigasi), cek ada row di `myMenuAccess` yang `menu.path === state.url && canView === true`. **Fail-open kalau `myMenuAccess` kosong** (belum sempat fetch / network error) — sengaja gak ngeblock akses cuma gara-gara data belum ada, sama filosofinya kayak fallback sidebar. Kalau ada data tapi `canView` false → redirect ke `/` (sama kayak wildcard route yang udah ada, bukan halaman 403 baru).
+- `app.routes.ts` — dipasang **per child route**, bukan per parent group. Alasan: `pages/marketing/plafond/` dan `pages/superadmin/approval/` itu stub (`ng generate` default, belum ada fitur, gak pernah didaftarin ke `tbl_menu`/sidebar) — kalau guard dipasang di level parent (`marketing`/`admin`), 2 stub ini bakal ke-block permanen karena gak ada row match sama sekali. Jadi `menuAccessGuard()` cuma ditempel ke child route yang beneran terdaftar di Master Access: `admin/{overview,pengajuan,roles,staff,master-menu,master-access}`, `{marketing,branchmanager,backoffice}/{review-pinjaman,riwayat-review}`. `settings` sengaja TIDAK dikasih (bukan bagian Master Data, akses staff manapun).
+
+**Diverifikasi live, termasuk uji enforcement beneran** (bukan cuma baca kode): login superadmin, akses normal ke `/admin/master-access` jalan seperti biasa (no regression). Terus, khusus buat nguji, `canView` menu "List Request Pinjaman" buat role SUPERADMIN di-toggle `false` sementara lewat API (`PUT /api/v1/role-menu`), coba navigate langsung ke `/admin/pengajuan` → **berhasil ke-redirect ke `/`**, kebukti guard-nya kerja. Langsung di-toggle balik ke `true` dan diverifikasi ulang state-nya identik sama sebelum test (gak ada row lain yang kesenggol).
+
+**Batasan yang masih ada**: kalau `myMenuAccess` gagal fetch/network error, guard fail-open (izinin akses) — ini pilihan sadar (biar app gak lockout total gara-gara 1 request gagal), bukan bug, tapi berarti proteksi granular ini BUKAN pengganti `roleGuard()` — dia cuma lapisan tambahan di atasnya buat kasus "role benar tapi 1 menu di-uncheck". `roleGuard()` (role-level) tetap jalan seperti biasa dan gak fail-open.
+
+---
+
+## 🆕 [4 Sept 2026] Plafond system — ✅ SELESAI (v1: auto-calculate, gak ada assignment manual), verified live end-to-end
+
+Diskusi panjang sama user dulu sebelum coding (nyangkut formula, bukan cuma "bikin CRUD"). Keputusan final:
+
+**Formula plafond awal** (dihitung otomatis pas customer register, TIDAK ada UI assign manual — keputusan eksplisit user, jadi gak perlu bikin halaman "Master Nasabah" buat pilih customer):
+```
+base = (pendapatan_bulanan − utang_berjalan) × 3
+multiplier tipe_pekerjaan: KARYAWAN=1.0, PNS=1.0, WIRASWASTA=0.8, LAINNYA/null=0.7
+plafond_awal = base × multiplier, clamp ke [Rp2.000.000 minimum, limit_maksimal tier terdekat]
+```
+PNS **sengaja disamain skornya sama KARYAWAN** (keputusan eksplisit user — sama-sama income stabil/gajian tetap). Kalau `pendapatan_bulanan` masih null (customer belum lengkapin data / Android app belum kirim), langsung fallback ke minimum Rp2.000.000 tanpa coba hitung apa-apa.
+
+**DBR (Debt Burden Ratio) — dipisah dari plafond, bukan gantiin**: plafond = batas TOTAL boleh pinjem (level customer, independen tenor). DBR = apakah cicilan bulanan dari 1 pengajuan spesifik (tergantung tenor yang dipilih) masih masuk akal dibanding gaji — **informational buat bantu keputusan staff pas review, BUKAN hard-block otomatis**. Formula (flat rate, bukan reducing-balance):
+```
+total_bunga = nominal × interest_rate
+cicilan_bulanan = (nominal + total_bunga) / tenor
+DBR = cicilan_bulanan / pendapatan_bulanan
+```
+Ini sekaligus ngisi `estInstallment` yang dari awal project cuma placeholder "Belum dihitung" — backend gak pernah hitung ini di mana pun, jadi dihitung client-side aja (`pengajuan-api.model.ts`, fungsi `calculateEstInstallment`), reuse data yang udah ada di response (gak perlu endpoint baru).
+
+**Backend baru** (`PlafondEntity`/`UserPlafondEntity` ternyata **udah ada dari sebelumnya** sebagai entity kosong, gak pernah dipakai — tinggal dibikinin repository/service/controller-nya):
+- `PlafondRepository`, `UserPlafondRepository`
+- `PlafondService` (CRUD tier catalog) + `PlafondController` (`/api/v1/plafond`, superadmin-only, `SecurityConfig` rule baru)
+- `UserPlafondService.calculateAndAssign()` — logic formula di atas, dipanggil sekali di `CustomerAuthService.register()`. Kalau `tbl_plafond` masih kosong (belum ke-seed sama sekali) sengaja **skip, bukan gagalin registrasi** — customer tetep kebuat, plafond nyusul kalau tier udah ada.
+- Sinkron ke kolom lama `tbl_customer.plafond` juga (biar tempat lain yang masih baca kolom itu langsung, bukan `tbl_user_plafond`, gak nampilin 0 terus)
+- **Validasi di `PengajuanService.create()`**: cek `nominal_pengajuan <= limit_efektif` (dari `UserPlafondEntity` kalau ada, fallback ke `tbl_customer.plafond` kolom lama buat 18 customer dummy lama yang gak punya `UserPlafondEntity` row) — tolak dengan pesan jelas kalau kelebihan.
+
+**Frontend baru**: `shared/models/plafond.model.ts`, `shared/components/plafond-form-modal/` (CRUD form, pola sama kayak role-form-modal), `pages/superadmin/master-plafond/` (CRUD table). Sidebar entry "Master Plafond" (icon `LucideWallet`) di grup MASTER DATA. Drawer (`loan-review-drawer.ts`/`.html`) dapet badge DBR baru (ijo kalau ≤33%, merah kalau >33%), muncul cuma kalau `pendapatan_bulanan` customer ada datanya.
+
+**✅ [4 Sept 2026] Stub `pages/marketing/plafond/` DIHAPUS** (route + folder) — user eksplisit bilang "gajadi" (dibatalkan): sistem Plafond yang beneran (`/admin/master-plafond`) gak butuh halaman apapun di sisi marketing (auto-calculate, gak ada assignment manual), dan seandainya pun butuh, itu bukan tanggung jawab role Marketing. Jangan bikin ulang halaman ini kecuali user eksplisit minta lagi.
+
+**⏳ `pages/superadmin/approval/` (`/admin/approval`) — SENGAJA DIBIARIN dulu, "dipikirin lagi"**: user awalnya juga mau hapus ini (alasan: superadmin gak boleh approve — udah established, `PengajuanController` cuma kasih superadmin `cancel-admin` override + read-only), tapi berubah pikiran mau mikirin ulang dulu sebelum diputusin. **Jangan hapus folder ini tanpa nanya user lagi** — beda dari `marketing/plafond` yang udah jelas keputusannya.
+
+**Diverifikasi live, end-to-end, bukan cuma unit-level**:
+1. Seed 4 tier (Bronze Rp2jt / Silver Rp7.5jt / Gold Rp15jt / Platinum Rp50jt) via API
+2. Register customer test KARYAWAN (gaji 5jt, utang 1jt) → plafond ke-assign **Rp12.000.000** persis sesuai formula tangan `(5jt-1jt)×3×1.0`
+3. Register customer test WIRASWASTA (gaji sama) → **Rp9.600.000**, persis `×0.8`
+4. Login sebagai customer test, `POST /api/v1/pengajuan` nominal Rp20jt (ngelebihin plafond 12jt) → **ditolak 422** dengan pesan jelas; nominal Rp8jt (di bawah plafond) → **berhasil dibuat**
+5. Drawer superadmin nampilin pengajuan itu: Est. Installment **Rp1.373.333** (persis `(8jt+8jt×3%)/6`), badge DBR **27%** warna ijo (persis `1.373.333/5.000.000`)
+6. Master Plafond page render bener + sidebar-nya muncul (setelah di-daftarin ke `tbl_menu`/`tbl_role_menu` via API, pola sama kayak Riwayat Review Saya)
+
+**Scope eksplisit DI LUAR sesi ini** (dicatat, bukan lupa): red zone & kelengkapan dokumen sebagai modifier tambahan formula, plafond naik otomatis dari riwayat bayar lancar (butuh sistem cicilan/pembayaran dulu yang belum ada sama sekali), halaman Master Nasabah/assignment manual (user eksplisit bilang gak perlu). Semua ini "nanti kalau perlu", bukan next-next-priority otomatis.
+
+## 🆕 [4 Sept 2026] Stub `pages/marketing/plafond/` dihapus, `pages/superadmin/approval/` dibiarin
+
+User review balik daftar stub setelah cleanup pass: `pages/marketing/plafond/` **dihapus** (route + folder) — "gajadi", karena sistem Plafond yang beneran (`/admin/master-plafond`) auto-calculate, gak butuh halaman apapun di sisi Marketing, dan seandainya pun butuh UI, itu bukan tanggung jawab role Marketing. `pages/superadmin/approval/` **sengaja DIBIARIN** — user awalnya juga condong hapus (alasan sama: superadmin gak boleh approve, udah established dari desain awal), tapi bilang "dipikirin lagi deh" — jangan hapus folder ini tanpa nanya user lagi, beda keputusan dari yang plafond.
+
+## 🆕 [4 Sept 2026] Restyle `loan-review-drawer` ke tema netral — ✅ SELESAI, verified live (desktop + mobile)
+
+Item terakhir dari redesign 2 Sept yang belum ke-apply — drawer masih full emerald-tinted sementara `loan-queue-list` udah netral dari lama. Sekarang disamain persis pola `loan-queue-list.html`:
+- Card background: `bg-emerald-950/50 border-emerald-500/15` → `bg-slate-800/55 border-white/8` (semua 4 card: Applicant Info, Employment & Financial, Loan Request, Riwayat Review)
+- Avatar circle: emerald → `bg-slate-600/40 border-white/10 text-slate-200`
+- Label/teks sekunder: `text-emerald-400/60` → `text-slate-500`, teks utama `text-emerald-100` → `text-slate-100`
+- Input (Nominal Disetujui, textarea catatan): background netral `bg-slate-800/60 border-white/10`, emerald cuma di focus ring (`focus:border-emerald-400/50`) — pola sama kayak input di halaman lain (Settings dkk)
+- **🆕 Tambahan baru**: header drawer sekarang nampilin **status badge** (pakai `STATUS_BADGE_STYLES` yang sama kayak queue-list — amber/cyan/mint/emerald/red per status) di sebelah judul — sebelumnya drawer gak nampilin status pengajuan sama sekali, padahal cardnya di list udah nampilin. `statusBadge` di-expose ke template persis pola `loan-queue-list.ts`.
+- Emerald **sengaja dipertahankan** cuma di elemen yang emang butuh warna semantik: Monthly Income (hijau = positif), tombol Approve (CTA utama), DBR badge kalau ≤33% (aman), Est. Installment (angka penting). Existing Debts tetap rose/merah (semantik negatif) — bukan ikut netral, karena warnanya di situ bukan dekorasi tapi makna.
+
+Diverifikasi live: desktop (status badge muncul bener, semua card netral, Employment & Financial + DBR tetep kebaca jelas) dan mobile 375px (gak ada overflow, badge wrap rapi di sebelah judul, semua card stack bersih). Console bersih, `tsc --noEmit` clean.
+
+## 🆕 [4 Sept 2026] Landing page — 2 bug layout di-fix (customer-navbar/customer-home)
+
+User nanya "landing page perlu di-enhance gak" → dicek langsung di browser (desktop + mobile), ketemu 2 bug nyata (bukan soal selera):
+
+**1. Badge hero saling tumpuk di mobile** — `customer-home.css`, 6 "sticker" badge (`badge-top-left`, `badge-top-right`, dst) di-posisi absolute dengan jarak yang didesain buat layar lebar. Di mobile (375px), teksnya lebih lebar dari ruang yang ada, jadi 2 badge yang sejajar horizontal (`badge-top-left`+`badge-top-right`, dan `badge-bottom-center`+`badge-bottom-right`) saling ketiban teks. **Fix**: re-stagger posisi vertikal mobile-only (cuma ubah nilai default/mobile, SEMUA `sm:`/`lg:` dibiarin gak disentuh — desain desktop persis sama kayak sebelumnya) — tiap badge sekarang punya "band" ketinggian sendiri, gak ada 2 badge yang share baris horizontal yang sama lagi.
+
+**2. Section gak punya `scroll-margin-top` konsisten** — cuma section `cara-kerja` yang punya `scroll-mt-36`, section lain (`fitur`, `tarif`, `simulasi`, `footer`) gak ada. Ditambahin biar konsisten/defensif buat native anchor scroll. **Catatan penting**: pas diverifikasi, ternyata `scrollToSection()` (dipanggil pas klik nav link) itu custom JS (`customer-navbar.ts`/`customer-home.ts`) yang UDAH punya offset manual sendiri (`-90px` di mobile, `block:'center'` di desktop) — gak baca `scroll-margin-top` CSS sama sekali. Diukur langsung: offset `-90px` yang udah ada itu SUDAH cukup (16px clearance dari bawah nav), jadi klik-nav-link **sebenernya gak pernah bug** dari awal. `scroll-mt-36` yang ditambah cuma buat hardening/konsistensi ke depan (kalau nanti ada native `<a href="#fragment">` baru), bukan fix bug yang beneran kejadian.
+
+**Nav yang "ngambang nutupin konten pas di-scroll manual (bukan klik link)"**: ini BUKAN bug — itu emang perilaku normal `position: fixed` dengan z-index tinggi, dan user eksplisit konfirmasi itu emang yang dia mau ("navbarnya ngikut gitu"). Gak diubah.
+
+**File yang diubah**: `customer-home.html` (+`scroll-mt-36` di 4 section), `customer-home.css` (re-stagger 6 badge position, mobile-only). Diverifikasi live desktop+mobile, gak ada regresi di layout desktop (semua `sm:`/`lg:` value asli, gak disentuh).
+
+### 🆕 [4 Sept 2026, lanjutan] Landing page — round 2: audit lebih ketat + 2 temuan baru
+
+User kasih screenshot ketauan badge bottom-left/bottom-center masih nabrak dikit (fix round 1 masih belum cukup lebar gap-nya), plus minta badge/HP dibikin **sedikit lebih besar** dan **lebih tersebar**, plus minta audit responsif menyeluruh (bukan cuma 1 lebar layar).
+
+**Fix badge round 2** — gap antar-band diperlebar jauh lebih generous (dari ~18-30px jadi >90px semua), plus:
+- `showcase-stage` mobile height: 580px → 660px (lebih banyak ruang)
+- `phone-wrapper` mobile width: 320px (`w-80`) → 336px (`w-[21rem]`) — sesuai request "sedikit lebih besar"
+- `.badge-sticker` base text: `text-xs` (mobile) → `text-sm` — badge jadi lebih kebaca, sesuai request. (`badge-bottom-left` sempet punya override `text-xs` sendiri yang bikin fix ini gak kepakai di situ — dihapus biar konsisten.)
+- **Diverifikasi programatik** (bukan cuma visual): script cek collision pairwise (6 badge × 6 badge) dijalanin di 7 lebar layar (320/375/428/639/640/768/1280px) — **nol collision di semua titik**, lebih ketat dari verifikasi round 1 yang cuma ngecek 1 lebar.
+
+**2 temuan baru pas audit menyeluruh (bukan soal badge sama sekali)**:
+
+1. **✅ FIXED — `.btn-billboard-cta` gak punya CSS rule sama sekali.** Class ini dipakai di tombol "Mulai Pengajuan Sekarang" (section CTA billboard) tapi gak pernah didefinisiin di `customer-home.css` manapun — jadi tombolnya render tanpa flex/padding/background sama sekali, teks & ikon panah ke-wrap ke baris terpisah. **Ini bug di SEMUA lebar layar, bukan cuma mobile** — kelewat kedeteksi di sesi sebelumnya karena gak pernah di-scroll sampai situ. Ditambahin style pill emerald yang konsisten sama brand.
+
+2. **✅ FIXED (lanjutan sesi ini) — dua nav ("dynamic island" pill + "landing-nav" logo/Masuk Staff) saling tabrak di lebar ~640-900px (tablet/small-desktop).** Struktur halaman ini punya 2 nav terpisah yang sama-sama nempel di atas: `customer-navbar.html`'s `.dynamic-island` (pill mengambang "Fitur/Cara Kerja/dst", `fixed z-[100]`) DAN `customer-home.html`'s `.landing-nav` (logo "Saku-ku" kiri + tombol "Masuk Staff" kanan, `z-30`, di dalam normal flow). Di mobile (<640px) pill nav lebar penuh nutupin landing-nav total (gak keliatan tabrakannya). Di desktop (≥1024px) ada cukup ruang buat 3-3-nya (logo, pill, tombol) muat berdampingan. **Tapi di rentang 640-900px, pill nav yang lebarnya berbasis konten (bukan responsive-shrink) numpuk ke logo (kiri) dan tombol Masuk Staff (kanan)** — diukur langsung: di 820px overlap ~40px sama tombol, di 900px udah gak overlap tapi mepet 0px gap.
+
+**Scope yang udah diverifikasi bersih di semua lebar (320-1280px)**: hero, feature cards, step cards ("Cara Kerja"), pricing cards ("Produk"), kalkulator simulasi, CTA billboard (setelah fix), footer — semua stack/reflow dengan baik, gak ada overflow horizontal.
+
+### 🆕 [4 Sept 2026, lanjutan lagi] Nav collision — FIXED, "Masuk Staff" dihapus + logo di-center permanen
+
+Keputusan user: tombol "Masuk Staff" **dihapus total** dari landing page (alasan: "landing pagenya kan buat customer", staff login gak perlu tombol di halaman customer-facing), dan logo di-center di semua lebar layar — bukan cuma workaround mobile.
+
+**Kenapa cukup hapus tombol doang gak nyelesein masalah (percobaan pertama gagal)**: percobaan awal cuma ganti `.landing-nav` jadi `justify-center sm:justify-start` (center di mobile, balik left-align dari `sm:`/640px ke atas) — asumsinya logo bisa balik ke kiri begitu tombolnya udah hilang. **Salah**: `sm:justify-start` aktif PERSIS di 640px, yaitu DI DALAM rentang collision (640-900px) yang mau difix. Diverifikasi via screenshot di 820px — teks "Saku-ku" masih kepotong ketiban pill nav ("Saku-k" doang yang keliatan). Root cause sebenarnya bukan soal tombol yang makan tempat — `.dynamic-island` itu `fixed top-6` (posisi vertikal konstan ~24-82px di SEMUA breakpoint, gak ada responsive override), jadi elemen APAPUN yang duduk di band vertikal yang sama bakal ketiban, gak peduli itu logo doang atau logo+tombol.
+
+**Fix final** — `.landing-nav` diubah permanen jadi (bukan cuma mobile):
+```css
+.landing-nav {
+  @apply w-full max-w-7xl mx-auto pt-24 px-6 sm:px-8 flex items-center justify-center relative z-30 pointer-events-auto;
+}
+```
+`justify-center` UNCONDITIONAL (gak ada `sm:justify-start` lagi) + `pt-6` → `pt-24` (96px clearance, dorong logo row ke bawah band `.dynamic-island` di SEMUA lebar layar). Logo sekarang selalu 1 baris sendiri, center, di bawah pill nav — bukan cuma di mobile.
+
+**File yang diubah**: `customer-home.html` (hapus `<div class="nav-links-right">` beserta tombol "Masuk Staff" di dalamnya — `<nav class="landing-nav">` sekarang cuma isi `<div class="brand-group">`), `customer-home.ts` (hapus `Router`/`inject`/`LucideArrowUpRight` import, hapus method `goToLogin()` — udah gak dipanggil dari mana pun, dicek via grep dulu sebelum dihapus), `customer-home.css` (`.landing-nav` rule di atas, hapus `.btn-nav-login` rule yang jadi dead code).
+
+**Diverifikasi programatik + visual di 3 lebar** (bukan cuma screenshot tunggal): script `getBoundingClientRect()` pairwise-overlap check antara `.island-container` dan `.brand-group`:
+- Mobile 375px: island bottom=82px, brand top=96px → gap 14px, **no overlap**
+- 820px (lebar yang sebelumnya kebukti break, dites lagi persis di titik yang sama) — island bottom=82px, brand top=96px → gap 14px, **no overlap**
+- Desktop 1440px: island bottom=74px, brand top=96px → gap 22px, **no overlap**
+
+Screenshot mobile & desktop dicek juga — layout logo-center-di-bawah-pill kebaca sebagai desain yang disengaja, bukan cuma "workaround kepepet" (rapi juga di desktop, gak keliatan aneh biarpun ada banyak ruang horizontal kosong di sampingnya).
+
+**Konsekuensi**: rute `/login` (staff login) sekarang gak ada entry point dari landing page customer sama sekali — sesuai keputusan user, staff diasumsikan tau URL `/login` langsung (atau nanti dikasih link terpisah kalau ternyata dibutuhin).
+
+### 🆕 [4 Sept 2026, sesi keenam] Badge collision beneran (bl vs bc) — FIXED, plus logo dihapus total, phone +10%, glassmorphism decorator nambah
+
+User laporan (dengan screenshot) 2 badge di hero ("TERVERIFIKASI & DIAWASI" dan "Hitung Simulasi Pinjaman →") masih nabrak di desktop, padahal round 2 (4 Sept, sesi sebelumnya) udah "diverifikasi programatik 7 lebar layar, nol collision". Investigasi ulang nemuin 2 hal:
+
+**1. Gotcha testing penting buat next session**: pas awal investigasi, `getComputedStyle` sempet ngasih hasil yang KELIATANNYA aneh (breakpoint `sm:`/`lg:` gak pernah ke-apply sama sekali, bahkan pas dipaksa `!important` inline lewat JS) — ternyata itu **stale style-cache di tab browser yang sama abis dipakai resize berkali-kali tanpa reload** (kemungkinan artifact dari harness testing/CDP, bukan bug beneran — reload browser fix ini instan). **Pelajaran**: kalau lagi testing responsive CSS pake `resize_window` berkali-kali di 1 tab yang sama, WAJIB `navigate` (reload) ulang sebelum tiap pengukuran `getComputedStyle`/`getBoundingClientRect`, jangan cuma resize doang — kalau enggak, hasil pengukuran bisa nunjukkin state basi yang nyesatin (persis kejadian di sesi ini, awalnya keliatan kayak "SEMUA breakpoint gak jalan" padahal setelah reload semua normal).
+
+**2. Bug beneran, setelah reload**: `.badge-bottom-left` (fixed left offset) dan `.badge-bottom-center` (dulu: bottom-anchored + `sm:left-1/3` center-relative) sama-sama numpuk di SATU band horizontal yang sama di `sm`/`lg` — 3 badge (bl/bc/br) masing-masing ~210-245px lebar berebut 1 baris di stage yang cuma 640-1024px, gak cukup ruang. **Konsisten collide di SEMUA lebar ≥640px** (diverifikasi ulang programatik — reload + pairwise `getBoundingClientRect` check — di 700/900/1200px, ketiganya collide identik), bukan cuma di 1 titik tanggung kayak dugaan sebelumnya. Verifikasi "round 2" sebelumnya kemungkinan besar kena stale-cache issue yang sama di poin 1, makanya kelewat.
+
+**Fix**: `.badge-bottom-center` di `sm:`/`lg:` dipindah total jadi **"mid-left"** (cermin `.badge-mid-right`: `top-1/2 -translate-y-8`, bukan lagi bottom-anchored+center) — band vertikal ini udah kebukti aman (gak pernah collide sama top-row atau bottom-row manapun di pengukuran manapun). Mobile (base, `<640px`) TIDAK disentuh, sudah aman dari sebelumnya. Hasil: badge sekarang kebaca sebagai 3 baris rapi (top: kuning+emerald, mid: cyan+mint, bottom: hijau tua+hijau dashed) — diverifikasi ulang programatik nol collision di 375/700/900/1200/1440px SEMUA reload-first, plus screenshot visual tiap lebar.
+
+**3 request lain yang dikerjain bareng sesi ini**:
+- **Logo "Saku-ku" (brand row di bawah pill nav) dihapus total** — user: gak perlu logo terpisah lagi, pill nav (`.dynamic-island`) cukup jadi satu-satunya elemen nav. `.landing-nav`/`.brand-group`/`.brand-logo-mask`/`.brand-name` dihapus dari CSS (dicek dulu via grep, gak dipakai di tempat lain — footer punya `.footer-brand-logo-mask` sendiri, beda class, gak kesenggol). Clearance yang tadinya dari `.landing-nav`'s `pt-24` dipindah ke `.hero-section` langsung (`pt-16 sm:pt-20` → `pt-24 sm:pt-28`) biar konten pertama tetap gak ketiban pill nav yang fixed.
+- **Handphone image +10% di semua breakpoint**: `w-[21rem] sm:w-[420px] md:w-[480px] lg:w-[540px]` → `w-[23rem] sm:w-[462px] md:w-[528px] lg:w-[594px]`. `.showcase-stage` min-height ikut naik dikit (700/720/760px, dari 660/680/740px) buat imbangin.
+- **Glassmorphism decorator ditambah**: `mesh-blob-4` baru (mint, `top-[58%] right-[8%]`) ngisi "gap" ambient light di area tarif/simulasi (sebelumnya cuma ada blob di ~0%/30%/90% tinggi halaman, gap di tengah-bawah). `section-glow-emerald` ditambah ke section `simulasi` (sebelumnya satu-satunya section yang belum punya glow lokal, padahal fitur/cara-kerja/tarif/billboard semua udah).
+
+**File yang diubah**: `customer-home.html` (hapus `<nav class="landing-nav">`, tambah `mesh-blob-4` div, tambah `section-glow` ke simulasi), `customer-home.css` (hapus 4 rule brand/nav, redesign `.badge-bottom-center`, `.phone-wrapper` +10%, `.showcase-stage` min-height naik, `.hero-section` padding naik, `.mesh-blob-4` baru). `customer-home.ts` gak ada perubahan (import/method terkait logo udah bersih dari sesi sebelumnya). `tsc --noEmit` clean.
+
+### 🆕 [4 Sept 2026, lanjutan lagi] Audit responsif menyeluruh + bug dekorator "numpuk kanan" — FIXED
+
+User minta cross-check ulang semua section (bukan cuma hero) buat responsif, plus komplain dekorator (blob/glow) keliatan numpuk di sisi kanan aja.
+
+**Audit responsif**: fitur, cara-kerja, tarif, simulasi, billboard, footer — dicek di 375px (mobile, scroll penuh tiap section) dan 1024px (grid column count via `getBoundingClientRect` — semua grid 4-kolom kebukti sejajar 1 baris, `scrollWidth` gak pernah > viewport width di manapun). Semua bersih, gak ada regresi dari perubahan-perubahan sesi ini (nav dihapus, phone dibesarin, badge dipindah).
+
+**Bug dekorator ketemu**: `.billboard-section` gak punya `position: relative` — `.section-glow` child-nya (position:absolute) jadinya "kabur" ke ancestor positioned TERDEKAT (`.landing-container`, paling atas), bukan nempel lokal ke billboard section sendiri. Efeknya: glow yang niatnya nempel di billboard (section itu fisiknya ada di ~80% tinggi halaman) malah render di ~25% tinggi halaman (deket fitur/cara-kerja) — kebukti langsung lewat `getComputedStyle(billboardSection).position === 'static'` dan posisi glow yang gak match section-nya. **Fix**: tambah `relative` ke `.billboard-section`. Diverifikasi: pageTop glow billboard pindah dari ~1123px ke ~3793px (proper spot, tepat sebelum footer).
+
+**Rebalance kiri-kanan**: setelah bug di atas kefix, dicek ulang sebaran SEMUA dekorator (`mesh-blob-1..4`, `glow-spot-top/bottom`, `section-glow-mint/emerald`) via script — urutin by `pageTop`, hitung `centerX` tiap satu relatif ke lebar `.landing-container`. Ketauan bagian tengah-bawah halaman (tarif→simulasi→footer) padet ke kanan (emerald tarif 89%, mesh-blob-4 71%, glow-spot-bottom 77%) — 3 dari situ semua kanan. **Fix**: glow `simulasi` yang baru ditambah sesi sebelumnya (`section-glow-emerald`, kanan) diganti jadi `section-glow-mint` (kiri) buat mecah pola itu. Hasil akhir (top-to-bottom): R(hero,50%) → L(35%) → R(73%) → L(8%) → L(8%) → R(89%,tarif) → R(71%,blob-4) → L(8%,simulasi-baru) → L(40%) → L(8%,billboard-abis-fix) → R(77%,footer) — alternate rapi, gak ada lagi "blok kanan" panjang.
+
+**File yang diubah**: `customer-home.css` (`.billboard-section` +`relative`), `customer-home.html` (glow simulasi: `section-glow-emerald`→`section-glow-mint`). `tsc --noEmit` clean, diverifikasi programatik (bukan cuma visual) via `getBoundingClientRect` sweep.
 
 ---
 
@@ -583,7 +815,7 @@ DTO backend: **tidak perlu ditest** kalau cuma polos (Lombok getter/setter). Bar
 **Enhancement**: (1) validasi error login — quick win; (2) konsolidasi API call; (3) limitasi token reset password (Redis/opsional); (4) OTP verifikasi email (baru, titik implementasi belum diputuskan).
 
 **🆕 Enhancement UI/UX (ditemukan 2 Sept, belum dikerjakan):**
-- `loan-review-drawer` masih full emerald-tinted (belum ikut redesign netral kayak `loan-queue-list`) — kandidat kuat buat direstyle biar konsisten satu tema di seluruh Review Pinjaman
+- ~~`loan-review-drawer` masih full emerald-tinted~~ — ✅ DONE 4 Sept 2026, udah disamain tema netral kayak `loan-queue-list`, sekalian nambah status badge di header
 - Ambiguitas nilai 0 di field employment/financial: begitu migration jalan, `existingDebts: 0` bisa jadi nilai asli (customer beneran gak punya utang) ATAU placeholder kosong — perlu keputusan desain, mungkin backend butuh nullable bukan default 0, biar frontend bisa bedain "beneran 0" vs "belum diisi"
 - Navbar Settings (ganti nama/password) belum ada action — nunggu endpoint ganti password (lihat Next Steps #3)
 - Toggle grid/list view buat queue (opsional, terinspirasi referensi UI, bukan prioritas)
@@ -611,15 +843,11 @@ Section 1–3 selesai. Belum: User Stories, Product Requirements, Business Rules
 8. Run migration `sakuku-migration-customer-pengajuan-fields.sql` → update entity Java → update dummy data → **update `ApiPengajuan` + mapper di `pengajuan-api.model.ts`** biar field yang tadinya placeholder (dob, employmentType, category, dst) keisi beneran → sekalian cabut logic "Belum tersedia" placeholder di `loan-review-drawer.html` begitu data asli ada
 9. ✅ ~~Entity `PlafondEntity`+`UserPlafondEntity`~~ — Plafond masih belum (di luar MVP, lihat Roadmap). **Master Data Menu backend+UI — SELESAI** (2 Sept, sesi keempat), lihat detail lengkap di section "Master Menu + Master Access" di atas.
 10. Testing: convert `auth.guards.spec.ts` ke Vitest syntax, triase 6 file failed lainnya
-11. Enhancement UI/UX (lihat Roadmap di atas): restyle `loan-review-drawer` ke tema netral, keputusan nullable vs default-0 buat field financial
+11. ~~Enhancement UI/UX: restyle `loan-review-drawer` ke tema netral~~ — ✅ DONE 4 Sept 2026. Keputusan nullable vs default-0 buat field financial udah otomatis kejawab (field-nya emang nullable, FE nampilin "Belum tersedia" vs angka asli).
 12. Cleanup pass: hapus file duplikat/legacy yang ditandai ⚠️ di atas (konfirmasi ke user dulu per file)
 13. FRD lanjutan, Swagger/Postman docs, Redis/coverage/CI-CD — prioritas rendah
 14. ✅ ~~Halaman Master Staff~~ — SELESAI (2 Sept), `GET /api/v1/user` confirmed jalan, model FE sudah match response asli
-15. **🆕 Sinkronin Master Access ke sistem beneran** — user udah confirmed mau ("gapapa kalau mau disinkron"), tapi belum dieksekusi, ini next-next priority setelah istirahat. Rencana teknis (lihat rincian lengkap di section "Rencana: Sinkronisasi Master Access" di bawah):
-    - Sidebar dinamis: `sidebar.ts` fetch `GET /api/v1/menu` + `GET /api/v1/role-menu/role/{roleId}` (role user login) alih-alih baca `MENU_CONFIG` hardcoded
-    - Route guard baca permission dari situ juga (bukan cuma `roleGuard(['role1','role2'])` hardcoded)
-    - Perlu mikirin: gimana `MENU_CONFIG.route` (string path Angular) nyambung ke `tbl_menu.path` (harus persis sama polanya), gimana fallback kalau staff punya `can_view=false` tapi coba akses langsung via URL (guard harus nolak, bukan cuma sembunyiin sidebar item)
-    - Belum diputuskan: apa SEMUA sidebar item harus didaftarin ke `tbl_menu` dulu (termasuk yang sifatnya gak per-role kayak Overview), atau cuma yang emang butuh access control granular
+15. ✅ ~~Sinkronin Master Access ke sistem beneran~~ — SELESAI (3 Sept), KEDUANYA: sidebar dinamis (baca `myMenuAccess`) DAN route guard (`menuAccessGuard()`, enforcement beneran, bukan cuma sembunyiin link). Lihat section "Sinkronisasi Master Access ke route guard" di atas buat detail lengkap + hasil verifikasi live.
 
 ### File baru/berubah — 1 Sept 2026 (sesi chat pertama)
 - 🆕 `shared/models/pengajuan-api.model.ts` — `ApiPengajuan` + `mapApiPengajuanToLoanApplication()`
@@ -702,4 +930,4 @@ Kalau kerja dari Claude Code di PC:
 4. `C:\Users\User\.claude\knowledge\testing-standards.md`
 5. Project-local `knowledge/` folder (gitignored): `README.md`, `PRD.md`, `ARCHITECTURE.md`, `TODO.md`, `WORKFLOW.md`, `SKILL.md` — baca `WORKFLOW.md` dulu (rules), lalu `TODO.md` (status).
 
-**Last Updated**: 2026-09-03 (sesi kelima — Ganti Password selesai, migration `tujuan_pinjaman` selesai & verified live, Riwayat Review Saya selesai [backend+FE, nunggu seeding Master Menu/Access manual biar nongol di sidebar]. Sinkronisasi Master Access ke sidebar/guard beneran masih rencana, belum dieksekusi — lihat Next Steps #15.)
+**Last Updated**: 2026-09-04 (sesi keenam — badge collision beneran (bl vs bc) di hero landing page FIXED: root cause 3 badge (bottom-left/bottom-center/bottom-right) berebut 1 band horizontal sempit di `sm`/`lg`, konsisten collide di SEMUA lebar ≥640px (bukan cuma 1 titik tanggung kayak dugaan round-2 sebelumnya, yang ternyata kena gotcha testing: stale style-cache abis resize_window berkali-kali tanpa reload browser — WAJIB reload sebelum tiap pengukuran responsive CSS ke depannya). Fix: `.badge-bottom-center` dipindah jadi "mid-left" (cermin `.badge-mid-right`) di `sm`/`lg`, band vertikal yang udah kebukti aman. Sekalian: logo "Saku-ku" dihapus total dari landing page (pill nav aja cukup), handphone image +10% semua breakpoint, `mesh-blob-4` + `section-glow` baru di `simulasi` buat nutup gap ambient-light glassmorphism. Diverifikasi programatik (reload-first pairwise collision check) di 375/700/900/1200/1440px — nol collision semua titik — plus screenshot visual tiap lebar. Sebelumnya (sesi kelima) landing page nav-collision (tombol "Masuk Staff" dihapus, logo di-center permanen di bawah pill nav — sebelum diputuskan dihapus total sesi ini), Plafond system v1 selesai & verified live end-to-end (formula auto-calculate `(pendapatan-utang)×3×multiplier_pekerjaan`, PNS=KARYAWAN=1.0/WIRASWASTA=0.8/LAINNYA=0.7, clamp ke tier `tbl_plafond`, validasi di `PengajuanService.create()`, DBR badge + `estInstallment` akhirnya keisi beneran), cleanup 6 file/folder legacy terverifikasi unused, stub `pages/marketing/plafond/` dihapus (`pages/superadmin/approval/` sengaja dibiarin, "dipikirin lagi"), `loan-review-drawer` restyle ke tema netral + status badge baru di header. Sebelumnya (3 Sept) Ganti Password, migration `tujuan_pinjaman` + `tbl_customer` (SEMUA field migration selesai), Riwayat Review Saya, sinkronisasi Master Access ke sidebar DAN route guard (`menuAccessGuard()`, verified live via toggle-test), 2 bug lama BM approve/reject notes ke-fix, plus full audit `knowledge/` folder (10/10 file dicek, Auth0/Strategy Pattern/status salah dikoreksi semua).

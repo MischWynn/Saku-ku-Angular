@@ -2,11 +2,15 @@
 import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
+import { httpResource } from '@angular/common/http';
 import { filter } from 'rxjs/operators';
 import { LucideSettings, LucideBell, LucideChevronRight, LucideUser } from '@lucide/angular';
 import { MENU_CONFIG } from '../../shared/config/sidebar-menu.config';
 import { ROLE_DISPLAY_NAME, BusinessRole } from '../../shared/config/role.config';
 import { AuthService } from '../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
+import { ApiResponse } from '../../shared/models/api-response';
+import { ReviewActivity } from '../../shared/models/dashboard-summary';
 
 // export interface UserProfile {
 //   name: string;
@@ -36,7 +40,19 @@ export class NavbarComponent implements OnInit {
     };
   });
 
-  hasNotification = signal<boolean>(true); // TODO: connect ke GET /api/v1/review-log/me
+  // Reuse endpoint yang sama kayak Riwayat Review Saya — titik merah muncul kalau ada
+  // review yang dia lakuin dalam 24 jam terakhir. Sengaja gak bikin read/unread state
+  // beneran (butuh nyimpen "terakhir dilihat kapan" per user) — MVP dulu.
+  private readonly reviewLogResource = httpResource<ApiResponse<ReviewActivity[]>>(
+    () => `${environment.apiUrl}/review-log/me`
+  );
+
+  hasNotification = computed(() => {
+    const logs = this.reviewLogResource.value()?.data ?? [];
+    if (logs.length === 0) return false;
+    const latest = new Date(logs[0].createdAt).getTime();
+    return Date.now() - latest < 24 * 60 * 60 * 1000;
+  });
 
     breadcrumb = computed(() => {
     const path = this.currentPath();

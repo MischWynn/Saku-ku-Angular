@@ -69,23 +69,26 @@ export abstract class ReviewQueueBase {
     const targetId = this.selectedItem()?.id;
     if (!path || !targetId) return;
 
-    const bodyKey = payload.action === 'APPROVE' ? 'catatan' : 'alasan';
+    // Backend (PengajuanReviewRequest) cuma punya field `catatan` — dipakai buat approve MAUPUN reject.
+    const body: Record<string, unknown> = { catatan: payload.notes ?? '' };
+    if (payload.action === 'APPROVE' && payload.nominalDisetujui != null) {
+      body['nominalDisetujui'] = payload.nominalDisetujui;
+    }
+
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
     this.http
-      .patch<ApiResponse<LoanApplication>>(`${this.apiUrl}/${targetId}/${path}`, {
-        [bodyKey]: payload.notes ?? '',
-      })
+      .patch<ApiResponse<LoanApplication>>(`${this.apiUrl}/${targetId}/${path}`, body)
       .subscribe({
         next: () => {
           this.isSubmitting.set(false);
           this.selectedId.set(null);
           this.queueResource.reload();
         },
-        error: () => {
+        error: (err) => {
           this.isSubmitting.set(false);
-          this.errorMessage.set('Gagal memproses pengajuan. Silakan coba lagi.');
+          this.errorMessage.set(err?.error?.message || 'Gagal memproses pengajuan. Silakan coba lagi.');
         },
       });
   }

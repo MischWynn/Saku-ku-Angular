@@ -1,10 +1,11 @@
-import { LoanApplication, LoanStatus } from './loan-application';
+import { EmploymentType, LoanApplication, LoanStatus } from './loan-application';
 
 /**
  * Bentuk ASLI response dari GET /api/v1/pengajuan/status/{status}.
- * Ini beda dari `LoanApplication` (yang dirancang untuk field pasca-migration,
- * lihat sakuku-migration-customer-pengajuan-fields.sql — belum dieksekusi).
- * Field employment/income/dob dsb BELUM ada di backend sekarang.
+ * Ini beda dari `LoanApplication` (yang dirancang untuk field pasca-migration).
+ * Field customer (dob, employment, income) ditambah 3 Sept 2026 — lihat CLAUDE.md
+ * "Migration field tbl_customer". `estInstallment` dihitung client-side (flat rate,
+ * lihat calculateEstInstallment) — backend gak pernah ngitung ini di mana pun.
  */
 export interface ApiPengajuan {
   id: string;
@@ -26,6 +27,12 @@ export interface ApiPengajuan {
     alamat: string;
     plafond: number;
     status: string;
+    tanggalLahir: string | null;
+    tipePekerjaan: string | null;
+    pekerjaan: string | null;
+    lamaBekerjaBulan: number | null;
+    pendapatanBulanan: number | null;
+    utangBerjalan: number | null;
   };
   bungaTenor: {
     id: string;
@@ -36,12 +43,34 @@ export interface ApiPengajuan {
 }
 
 /**
+ * Estimasi cicilan bulanan — flat rate (bunga dihitung sekali dari nominal, bukan
+ * reducing-balance), dibagi rata ke tenor. Dipakai juga buat DBR check di drawer
+ * (lihat loan-review-drawer.ts). Backend belum pernah hitung ini di mana pun.
+ */
+function calculateEstInstallment(nominal: number, tenor: number, interestRate: number): number {
+  if (tenor <= 0) return 0;
+  const totalBunga = nominal * (interestRate / 100);
+  const totalBayar = nominal + totalBunga;
+  return Math.round(totalBayar / tenor);
+}
+
+function calculateAge(dob: string): number {
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+/**
  * Adapter: API asli -> shape LoanApplication yang dipakai komponen (queue-list, drawer).
- * Field yang belum ada di backend (dob, age, employmentType, dst) diisi placeholder
- * aman sampai migration jalan — TODO: hapus placeholder ini begitu migration dieksekusi
- * dan backend beneran ngirim field-field itu.
+ * `estInstallment` masih placeholder (belum dihitung backend) — sisanya udah data asli.
  */
 export function mapApiPengajuanToLoanApplication(raw: ApiPengajuan): LoanApplication {
+  const dob = raw.customer.tanggalLahir ?? '';
   return {
     id: raw.id,
     appId: raw.id,
@@ -50,22 +79,22 @@ export function mapApiPengajuanToLoanApplication(raw: ApiPengajuan): LoanApplica
       nik: raw.customer.nik,
       name: raw.customer.namaLengkap,
       avatarUrl: undefined,
-      dob: '',                 // TODO: belum ada di backend (nunggu migration tanggal_lahir)
-      age: 0,                  // TODO: belum ada di backend
+      dob,
+      age: dob ? calculateAge(dob) : 0,
       phone: raw.customer.noHp,
       address: raw.customer.alamat,
-      employmentType: 'LAINNYA', // TODO: belum ada di backend (nunggu migration tipe_pekerjaan)
-      occupation: '',           // TODO: belum ada di backend
-      employmentLengthMonths: 0, // TODO: belum ada di backend
-      monthlyIncome: 0,          // TODO: belum ada di backend
-      existingDebts: 0,          // TODO: belum ada di backend
+      employmentType: (raw.customer.tipePekerjaan as EmploymentType) ?? 'LAINNYA',
+      occupation: raw.customer.pekerjaan ?? '',
+      employmentLengthMonths: raw.customer.lamaBekerjaBulan ?? 0,
+      monthlyIncome: raw.customer.pendapatanBulanan ?? 0,
+      existingDebts: raw.customer.utangBerjalan ?? 0,
     },
     loan: {
       requestedAmount: raw.nominalPengajuan,
       category: raw.tujuanPinjaman ?? '',
       tenorMonths: raw.tenor,
       interestRate: raw.interestRate,
-      estInstallment: 0,        // TODO: cek apakah backend sudah hitung ini di tempat lain
+      estInstallment: calculateEstInstallment(raw.nominalPengajuan, raw.tenor, raw.interestRate),
     },
   };
 }

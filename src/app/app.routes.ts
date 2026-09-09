@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import {LoginComponent} from '../app/pages/auth/login/login';
 import { DashboardLayoutComponent } from '../app/layout/dashboard-layout/dashboard-layout';
-import { roleGuard } from '../app/core/guards/auth.guards';
+import { roleGuard, menuAccessGuard } from '../app/core/guards/auth.guards';
 import { CustomerLayout } from '../app/layout/customer-layout/customer-layout';
 
 export const routes: Routes = [
@@ -46,33 +46,45 @@ export const routes: Routes = [
     canActivate: [roleGuard(['superadmin'])],
     children: [
       { path: '', redirectTo: 'overview', pathMatch: 'full' },
-      { 
-        path: 'overview', 
-        loadComponent: () => import('./pages/superadmin/overview/overview').then(m => m.Overview) 
+      {
+        path: 'overview',
+        canActivate: [menuAccessGuard()],
+        loadComponent: () => import('./pages/superadmin/overview/overview').then(m => m.Overview)
       },
-      { 
-        path: 'pengajuan', 
-        loadComponent: () => import('./pages/superadmin/pengajuan/pengajuan').then(m => m.Pengajuan) 
+      {
+        path: 'pengajuan',
+        canActivate: [menuAccessGuard()],
+        loadComponent: () => import('./pages/superadmin/pengajuan/pengajuan').then(m => m.Pengajuan)
       },
-      { 
-        path: 'approval', 
-        loadComponent: () => import('./pages/superadmin/approval/approval').then(m => m.Approval) 
+      {
+        // stub, belum ada di sidebar/tbl_menu — sengaja gak dikasih menuAccessGuard
+        path: 'approval',
+        loadComponent: () => import('./pages/superadmin/approval/approval').then(m => m.Approval)
       },
       {
         path: 'roles',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/superadmin/roles/roles').then(m => m.Roles)
       },
       {
         path: 'staff',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/superadmin/staff/staff').then(m => m.StaffComponent)
       },
       {
         path: 'master-menu',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/superadmin/master-menu/master-menu').then(m => m.MasterMenu)
       },
       {
         path: 'master-access',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/superadmin/master-access/master-access').then(m => m.MasterAccess)
+      },
+      {
+        path: 'master-plafond',
+        canActivate: [menuAccessGuard()],
+        loadComponent: () => import('./pages/superadmin/master-plafond/master-plafond').then(m => m.MasterPlafond)
       }
     ]
   },
@@ -84,16 +96,14 @@ export const routes: Routes = [
     canActivate: [roleGuard(['marketing'])],
     children: [
       { path: '', redirectTo: 'review-pinjaman', pathMatch: 'full' },
-      { 
-        path: 'plafond', 
-        loadComponent: () => import('./pages/marketing/plafond/plafond').then(m => m.Plafond) 
-      },
       {
         path: 'review-pinjaman',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/marketing/review-pinjaman/review-pinjaman').then(m => m.ReviewPinjaman)
       },
       {
         path: 'riwayat-review',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/staff/riwayat-review/riwayat-review').then(m => m.RiwayatReview)
       }
     ]
@@ -108,10 +118,12 @@ export const routes: Routes = [
       { path: '', redirectTo: 'review-pinjaman', pathMatch: 'full' },
       {
         path: 'review-pinjaman',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/branchmanager/review-pinjaman/review-pinjaman').then(m => m.ReviewPinjaman)
       },
       {
         path: 'riwayat-review',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/staff/riwayat-review/riwayat-review').then(m => m.RiwayatReview)
       }
     ]
@@ -126,10 +138,12 @@ export const routes: Routes = [
       { path: '', redirectTo: 'review-pinjaman', pathMatch: 'full' },
       {
         path: 'review-pinjaman',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/backoffice/review-pinjaman/review-pinjaman').then(m => m.ReviewPinjaman)
       },
       {
         path: 'riwayat-review',
+        canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/staff/riwayat-review/riwayat-review').then(m => m.RiwayatReview)
       }
     ]
