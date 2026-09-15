@@ -85,6 +85,11 @@ export const routes: Routes = [
         path: 'master-plafond',
         canActivate: [menuAccessGuard()],
         loadComponent: () => import('./pages/superadmin/master-plafond/master-plafond').then(m => m.MasterPlafond)
+      },
+      {
+        path: 'master-rate',
+        canActivate: [menuAccessGuard()],
+        loadComponent: () => import('./pages/superadmin/master-rate/master-rate').then(m => m.MasterRate)
       }
     ]
   },

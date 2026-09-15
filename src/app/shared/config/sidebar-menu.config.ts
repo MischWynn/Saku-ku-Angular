@@ -7,6 +7,7 @@ import {
   LucideShieldCheck,
   LucideHistory,
   LucideWallet,
+  LucidePercent,
 } from '@lucide/angular';
 
 export type SidebarRole = 'superadmin' | 'marketing' | 'branchmanager' | 'backoffice';
@@ -61,6 +62,7 @@ export const MENU_CONFIG: MenuGroup[] = [
       { title: 'Master Menu', route: '/admin/master-menu', icon: LucideLayers, roles: ['superadmin'] },
       { title: 'Master Access', route: '/admin/master-access', icon: LucideShieldCheck, roles: ['superadmin'] },
       { title: 'Master Plafond', route: '/admin/master-plafond', icon: LucideWallet, roles: ['superadmin'] },
+      { title: 'Master Rate', route: '/admin/master-rate', icon: LucidePercent, roles: ['superadmin'] },
     ],
   },
 ];
