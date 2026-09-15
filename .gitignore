@@ -45,3 +45,8 @@ Thumbs.db
 
 #Claude Settings
 /knowledge
+/.claude
+/.CLAUDE.md
+
+# Testing
+/coverage

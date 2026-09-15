@@ -1,1 +1,79 @@
-<p>roles works!</p>
+<div class="space-y-6">
+
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-white tracking-tight">Master Role</h1>
+      <p class="text-sm text-slate-400 mt-1">Daftar role yang tersedia di sistem (superadmin, marketing, branch manager, back office).</p>
+    </div>
+    <button
+      type="button"
+      (click)="openCreateModal()"
+      class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition-colors">
+      <svg lucidePlus class="w-4 h-4"></svg>
+      Tambah Role
+    </button>
+  </div>
+
+  <div class="rounded-3xl bg-emerald-900/30 backdrop-blur-xl border border-emerald-500/20 overflow-hidden">
+    @if (isLoading()) {
+      <p class="text-sm text-slate-400 p-6">Memuat data role...</p>
+    } @else if (hasError()) {
+      <p class="text-sm text-red-300 p-6">Gagal memuat data role. Silakan coba lagi.</p>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-white/10 text-[11px] uppercase tracking-wide text-slate-400">
+              <th class="px-5 py-3 font-semibold">Nama Role</th>
+              <th class="px-5 py-3 font-semibold">Deskripsi</th>
+              <th class="px-5 py-3 font-semibold text-right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (role of roleList(); track role.id) {
+              <tr class="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
+                <td class="px-5 py-3.5">
+                  <span class="font-semibold text-slate-100">{{ role.namaRole }}</span>
+                </td>
+                <td class="px-5 py-3.5 text-slate-300">{{ role.description || '—' }}</td>
+                <td class="px-5 py-3.5">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      (click)="openEditModal(role)"
+                      title="Edit"
+                      class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-emerald-300 hover:bg-white/5 transition-colors">
+                      <svg lucidePencil class="w-4 h-4"></svg>
+                    </button>
+                    <button
+                      type="button"
+                      (click)="onDelete(role)"
+                      [disabled]="deletingId() === role.id"
+                      title="Hapus"
+                      class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-400 hover:bg-white/5 transition-colors disabled:opacity-40">
+                      <svg lucideTrash2 class="w-4 h-4"></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="3" class="px-5 py-16 text-center text-slate-500 text-xs">Belum ada data role.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+  @if (isModalOpen()) {
+    <app-role-form-modal
+      [role]="editingRole()"
+      [submitting]="isSubmitting()"
+      [errorMessage]="formError()"
+      (close)="closeModal()"
+      (submitForm)="onSubmit($event)" />
+  }
+
+</div>

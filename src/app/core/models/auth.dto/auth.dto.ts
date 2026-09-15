@@ -1,5 +1,3 @@
-import { Component } from '@angular/core';
-
 export interface LoginRequestDTO {
   email: string;
   password: string;
@@ -7,6 +5,15 @@ export interface LoginRequestDTO {
 
 export interface AuthResponseDTO {
   token: string;
-  role: string;
+  type: string;
+}
+
+export interface ForgotPasswordRequest {
   email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  newPassword: string;
 }

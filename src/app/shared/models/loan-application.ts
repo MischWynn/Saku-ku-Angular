@@ -1,5 +1,5 @@
-export type UserRole = 'MARKETING' | 'BM' | 'BACK_OFFICE';
-export type EmploymentType = 'KARYAWAN' | 'WIRASWASTA' | 'LAINNYA';
+export type UserRole = 'MARKETING' | 'BM' | 'BACK_OFFICE' | 'SUPERADMIN';
+export type EmploymentType = 'KARYAWAN' | 'WIRASWASTA' | 'PNS' | 'LAINNYA';
 export type LoanStatus =
   | 'MARKETING_REVIEW'
   | 'BM_REVIEW'
@@ -29,7 +29,7 @@ export interface LoanDetail {
   category: string;          // tujuan_pinjaman: MODAL_USAHA, KONSUMTIF, dst
   tenorMonths: number;
   interestRate: number;
-  estInstallment: number;    // dihitung backend, dikirim di response
+  estInstallment: number;    // dihitung client-side (flat rate) — lihat pengajuan-api.model.ts
 }
 
 export interface LoanApplication {
@@ -44,4 +44,5 @@ export interface ReviewActionPayload {
   appId: string;
   action: 'APPROVE' | 'REJECT';
   notes?: string;
+  nominalDisetujui?: number; // wajib diisi BM pas approve — lihat PengajuanService.bmApprove()
 }

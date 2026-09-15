@@ -1,0 +1,113 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" (click)="close.emit()">
+  <div
+    class="w-full max-w-md rounded-3xl bg-slate-900/95 backdrop-blur-xl border border-white/10 shadow-2xl p-6"
+    (click)="$event.stopPropagation()">
+
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-lg font-bold text-white">{{ title() }}</h2>
+      <button
+        type="button"
+        (click)="close.emit()"
+        class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
+        <svg lucideX class="w-4 h-4"></svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Nama Lengkap</label>
+        <input
+          type="text"
+          formControlName="namaLengkap"
+          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-400/50" />
+        @if (form.controls.namaLengkap.invalid && form.controls.namaLengkap.touched) {
+          <p class="text-[11px] text-red-400 mt-1">Nama lengkap wajib diisi.</p>
+        }
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Username</label>
+        <input
+          type="text"
+          formControlName="username"
+          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-400/50 disabled:opacity-50 disabled:cursor-not-allowed" />
+        @if (isEditMode()) {
+          <p class="text-[11px] text-slate-500 mt-1">Username gak bisa diubah.</p>
+        } @else if (form.controls.username.invalid && form.controls.username.touched) {
+          <p class="text-[11px] text-red-400 mt-1">Username wajib diisi.</p>
+        }
+      </div>
+
+      @if (!isEditMode()) {
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Password</label>
+          <input
+            type="password"
+            formControlName="password"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-400/50" />
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <p class="text-[11px] text-red-400 mt-1">Minimal 8 karakter.</p>
+          }
+        </div>
+      }
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-400/50" />
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <p class="text-[11px] text-red-400 mt-1">Email tidak valid.</p>
+        }
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Role</label>
+          <select
+            formControlName="roleName"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-slate-100 focus:outline-none focus:border-emerald-400/50">
+            @for (role of roleOptions; track role) {
+              <option [value]="role">{{ roleLabel[role] ?? role }}</option>
+            }
+          </select>
+        </div>
+
+        @if (isEditMode()) {
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Status</label>
+            <select
+              formControlName="status"
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800/60 border border-white/10 text-sm text-slate-100 focus:outline-none focus:border-emerald-400/50">
+              @for (status of statusOptions; track status) {
+                <option [value]="status">{{ status }}</option>
+              }
+            </select>
+          </div>
+        }
+      </div>
+
+      @if (errorMessage(); as error) {
+        <p class="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3.5 py-2.5">{{ error }}</p>
+      }
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button
+          type="button"
+          (click)="close.emit()"
+          class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:bg-white/5 transition-colors">
+          Batal
+        </button>
+        <button
+          type="submit"
+          [disabled]="submitting()"
+          class="px-4 py-2 rounded-xl text-sm font-semibold bg-emerald-500 text-slate-950 hover:bg-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ submitting() ? 'Menyimpan...' : (isEditMode() ? 'Simpan Perubahan' : 'Tambah Staff') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

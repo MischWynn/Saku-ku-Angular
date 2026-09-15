@@ -43,4 +43,13 @@ export const ROLE_REVIEW_CONFIG: Record<UserRole, RoleActionConfig> = {
       // { type: 'REJECT', label: 'Batalkan', style: 'danger' },
     ],
   },
+  // Superadmin cuma monitoring — gak ada approve/reject/disburse (lihat PengajuanController,
+  // satu-satunya action khusus superadmin itu cancel-admin, bukan review flow ini).
+  // `actions: []` bikin drawer otomatis sembunyiin tombol aksi + textarea catatan.
+  SUPERADMIN: {
+    title: 'Detail Pengajuan',
+    notesLabel: '',
+    notesPlaceholder: '',
+    actions: [],
+  },
 };

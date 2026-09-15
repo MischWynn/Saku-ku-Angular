@@ -7,31 +7,13 @@
   <div class="mesh-blob mesh-blob-1"></div>
   <div class="mesh-blob mesh-blob-2"></div>
   <div class="mesh-blob mesh-blob-3"></div>
+  <div class="mesh-blob mesh-blob-4"></div>
 
-<!-- Top Navigation Header -->
-<nav class="landing-nav">
-  <div class="brand-group">
-    <span class="brand-logo-mask"></span>
-    <span class="brand-name">Saku-ku</span>
-  </div>
-  
-  <div class="nav-links-right">
-    <button 
-      type="button" 
-      (click)="goToLogin()" 
-      class="btn-nav-login"
-    >
-      <span>Masuk Staff</span>
-      <svg lucideArrowUpRight class="w-4 h-4"></svg>
-    </button>
-  </div>
-</nav>
-  
   <!-- Hero Content Section -->
   <section id="beranda" class="hero-section">
     
     <!-- Hero Title & Subtitle -->
-    <div class="hero-header-text">
+    <div class="hero-header-text reveal">
       <div class="hero-badge">
         <span class="badge-dot"></span>
         Platform Financing & Pinjaman Modern
@@ -135,9 +117,9 @@
 
 <!--  MENGAPA MEMILIH SAKU-KU (FITUR) -->
 
-<section id="fitur" class="section-container">
+<section id="fitur" class="section-container scroll-mt-36">
   <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
-  <div class="section-header">
+  <div class="section-header reveal">
     <h2 class="section-title">Mengapa Memilih Saku-ku?</h2>
     <p class="section-subtitle">
       Dirancang untuk memberikan pengalaman finansial terbaik dengan teknologi terkini dan keamanan berlapis.
@@ -147,7 +129,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
     
     <!-- Fitur 1: Proses Kilat -->
-    <div class="feature-card group">
+    <div class="feature-card group reveal">
       <div class="feature-icon-box">
         <svg lucideClock class="w-5 h-5 text-[#6EE7B7]"></svg>
       </div>
@@ -158,7 +140,7 @@
     </div>
 
     <!-- Fitur 2: Keamanan Terjamin -->
-    <div class="feature-card group">
+    <div class="feature-card group reveal">
       <div class="feature-icon-box">
         <svg lucideShieldCheck class="w-5 h-5 text-[#10B981]"></svg>
       </div>
@@ -169,7 +151,7 @@
     </div>
 
     <!-- Fitur 3: Bunga Kompetitif -->
-    <div class="feature-card group">
+    <div class="feature-card group reveal">
       <div class="feature-icon-box">
         <svg lucidePercent class="w-5 h-5 text-[#6EE7B7]"></svg>
       </div>
@@ -180,7 +162,7 @@
     </div>
 
     <!-- Fitur 4: Tanpa Jaminan -->
-    <div class="feature-card group">
+    <div class="feature-card group reveal">
       <div class="feature-icon-box">
         <svg lucideHandCoins class="w-5 h-5 text-[#10B981]"></svg>
       </div>
@@ -198,7 +180,7 @@
 
 <section id="cara-kerja" class="section-container scroll-mt-36">
   <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
-  <div class="section-header">
+  <div class="section-header reveal">
     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/10 border border-[#10B981]/30 mb-3">
       <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
       Alur Pengajuan
@@ -212,7 +194,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
     
     <!-- Step 1 -->
-    <div class="step-card">
+    <div class="step-card reveal">
       <span class="step-number">01</span>
       <div class="step-icon-wrapper">
         <svg lucideUserPlus class="w-5 h-5 text-[#6EE7B7]"></svg>
@@ -224,7 +206,7 @@
     </div>
 
     <!-- Step 2 -->
-    <div class="step-card">
+    <div class="step-card reveal">
       <span class="step-number">02</span>
       <div class="step-icon-wrapper">
         <svg lucideFileText class="w-5 h-5 text-[#10B981]"></svg>
@@ -236,7 +218,7 @@
     </div>
 
     <!-- Step 3 -->
-    <div class="step-card">
+    <div class="step-card reveal">
       <span class="step-number">03</span>
       <div class="step-icon-wrapper">
         <svg lucideSearchCheck class="w-5 h-5 text-[#6EE7B7]"></svg>
@@ -248,7 +230,7 @@
     </div>
 
     <!-- Step 4 -->
-    <div class="step-card">
+    <div class="step-card reveal">
       <span class="step-number">04</span>
       <div class="step-icon-wrapper">
         <svg lucideWalletCards class="w-5 h-5 text-[#10B981]"></svg>
@@ -265,16 +247,16 @@
 
 <!-- STRUKTUR TARIF TRANSPARAN (BUNGA & TENOR) -->
 
-<section id="tarif" class="section-container">
+<section id="tarif" class="section-container scroll-mt-36">
   <div class="section-glow section-glow-emerald" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
-  <div class="section-header">
+  <div class="section-header reveal">
     <h2 class="section-title">Produk Suku Bunga</h2>
     <p class="section-subtitle">
       Pilih tenor yang sesuai dengan kemampuan dan rencana keuangan Anda.
     </p>
   </div>
 
-  <div class="rates-wrapper-card">
+  <div class="rates-wrapper-card reveal">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
 
       <!-- 6 Bulan -->
@@ -316,8 +298,9 @@
 </section>
 
 <!-- SIMULASI KREDIT -->
-<section id="simulasi" class="section-container">
-  <div class="section-header">
+<section id="simulasi" class="section-container scroll-mt-36">
+  <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
+  <div class="section-header reveal">
     <span class="hero-badge">Simulasi Instan</span>
     <h2 class="section-title">Hitung Estimasi Pinjaman</h2>
     <p class="section-subtitle">
@@ -326,7 +309,7 @@
   </div>
 
   <!-- Samakan dengan lebar container atas -->
-  <div class="w-full max-w-6xl mx-auto">
+  <div class="w-full max-w-6xl mx-auto reveal">
     <app-loan-simulation></app-loan-simulation>
   </div>
 </section>
@@ -335,7 +318,7 @@
 
 <section class="billboard-section">
   <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
-  <div class="billboard-split-container">
+  <div class="billboard-split-container reveal">
     <div class="billboard-text-side">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/15 border border-[#10B981]/30 mb-3 w-fit">
         <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
@@ -364,7 +347,7 @@
 
 
 <!-- FOOTER GLASSMORPHISM SECTION -->
-<section id="footer">
+<section id="footer" class="scroll-mt-36">
 <footer class="footer-wrapper">
   <div class="footer-container">
 
