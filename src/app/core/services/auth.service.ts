@@ -87,7 +87,12 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  // Server-side logout ditambahin 19 Sept - sebelumnya token cuma di-clear LOKAL, JWT-nya
+  // sendiri masih valid di backend sampai TTL alami habis (lihat TokenBlacklistService,
+  // backend). Fire-and-forget: gak nunggu response-nya sebelum clear state lokal + redirect,
+  // biar logout tetap kerasa instan dan gak ke-block kalau network lagi bermasalah.
   logout(): void {
+    this.api.post(`${this.apiUrl}/logout`, {}).subscribe({ error: () => {} });
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem('userRole');
     this.currentUser.set(null);
