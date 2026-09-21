@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideMail, LucideLock, LucideEye, LucideEyeOff, LucideArrowRight } from '@lucide/angular';
 import { switchMap } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
@@ -18,10 +18,18 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   showPassword = signal(false);
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
+  // Prefill dari query param ?sessionExpired=true - dikirim authInterceptor pas 401 karena token
+  // basi (lihat auth.interceptor.ts), reuse alert error yang udah ada di template daripada bikin
+  // komponen toast baru.
+  errorMessage = signal<string | null>(
+    this.route.snapshot.queryParamMap.get('sessionExpired') === 'true'
+      ? 'Sesi Anda telah berakhir, silakan masuk kembali'
+      : null
+  );
 
   loginForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
