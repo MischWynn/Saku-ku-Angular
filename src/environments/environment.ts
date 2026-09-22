@@ -2,5 +2,5 @@
 
 export const environment = {
   production: true,
-  apiUrl: 'https://ourselves-prediction-village-quarter.trycloudflare.com/api/v1',
+  apiUrl: 'http://34.171.216.10:8080//api/v1',
 };

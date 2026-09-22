@@ -56,10 +56,33 @@ export class LoanReviewDrawerComponent {
   });
   protected readonly history = computed(() => this.historyResource.value()?.data ?? []);
 
+  // Foto KTP — endpoint terpisah (base64 bisa ratusan KB), sengaja LAZY: baru di-fetch kalau
+  // staff eksplisit klik "Lihat Foto KTP", bukan otomatis tiap drawer dibuka.
+  protected readonly showKtpPhoto = signal(false);
+  protected readonly ktpResource = httpResource<ApiResponse<string | null>>(() => {
+    const id = this.item()?.id;
+    return this.showKtpPhoto() && id ? `${this.apiUrl}/${id}/ktp` : undefined;
+  });
+  protected readonly ktpPhotoUrl = computed(() => {
+    const base64 = this.ktpResource.value()?.data;
+    return base64 ? `data:image/jpeg;base64,${base64}` : null;
+  });
+  protected readonly ktpLoading = computed(() => this.showKtpPhoto() && this.ktpResource.isLoading());
+  protected readonly ktpNotFound = computed(
+    () => this.showKtpPhoto() && !this.ktpResource.isLoading() && !this.ktpPhotoUrl()
+  );
+
   constructor() {
     effect(() => {
-      this.nominalDisetujuiInput.set(this.item()?.loan.requestedAmount ?? 0);
+      const current = this.item();
+      this.nominalDisetujuiInput.set(current?.loan.requestedAmount ?? 0);
+      // Reset viewer foto tiap ganti item, biar gak nyisain foto customer sebelumnya kebuka.
+      this.showKtpPhoto.set(false);
     });
+  }
+
+  protected viewKtpPhoto(): void {
+    this.showKtpPhoto.set(true);
   }
 
   onAction(action: 'APPROVE' | 'REJECT'): void {
