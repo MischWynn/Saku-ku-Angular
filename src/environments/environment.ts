@@ -2,5 +2,5 @@
 
 export const environment = {
   production: true,
-  apiUrl: 'http://34.171.216.10:8080/api/v1',
+  apiUrl: 'https://mysaku.morpkhai.web.id/api/v1',
 };
