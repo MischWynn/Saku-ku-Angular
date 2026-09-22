@@ -191,6 +191,15 @@
   animation: drift-b 24s ease-in-out infinite reverse;
 }
 
+/* 22 Sept 2026: blob ke-5 — nerangin transisi billboard->footer di ujung bawah halaman,
+   sisi kanan (mesh-blob-3 udah ngisi ~90% tinggi di sisi KIRI, jadi ini nyeimbangin sisi
+   kanan sekalian bikin footer gak keliatan gelap/kosong pas nyampe paling bawah). */
+.mesh-blob-5 {
+  @apply -bottom-10 right-[12%] w-[380px] h-[380px] opacity-[0.16];
+  background: radial-gradient(circle, #10B981, transparent 70%);
+  animation: drift-a 20s ease-in-out infinite reverse;
+}
+
 @keyframes drift-a {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(40px, -30px) scale(1.08); }

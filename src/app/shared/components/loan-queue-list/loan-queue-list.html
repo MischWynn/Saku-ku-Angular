@@ -23,7 +23,7 @@
             <h4 class="font-semibold text-slate-100 text-sm truncate group-hover:text-emerald-300 transition-colors">
               {{ item.applicant.name }}
             </h4>
-            <span class="text-[11px] text-slate-500 font-mono tracking-wider">ID: ...{{ item.appId.slice(-8) }}</span>
+            <span class="text-xs text-slate-500 font-mono tracking-wider">ID: ...{{ item.appId.slice(-8) }}</span>
           </div>
         </div>
 
@@ -33,14 +33,14 @@
             <div class="font-bold text-slate-100 text-sm whitespace-nowrap">
               Rp {{ item.loan.requestedAmount | number:'1.0-0' }}
             </div>
-            <div class="text-[10px] text-slate-500 mt-0.5 font-medium whitespace-nowrap">
+            <div class="text-xs text-slate-500 mt-0.5 font-medium whitespace-nowrap">
               {{ item.loan.category }} • {{ item.loan.tenorMonths }} Bln
             </div>
           </div>
 
           <span
             [class]="statusBadge[item.status].classes"
-            class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap">
+            class="shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border whitespace-nowrap">
             {{ statusBadge[item.status].label }}
           </span>
         </div>

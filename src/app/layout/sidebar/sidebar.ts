@@ -74,7 +74,11 @@ export class SidebarComponent implements OnInit {
     }
   }
 
+  // Sebelumnya cuma localStorage.clear() lokal - AuthService.logout() (yang sekarang juga
+  // manggil server buat blacklist token, lihat auth.service.ts) gak pernah dipanggil dari mana
+  // pun di app ini. Disambungin 19 Sept biar server-side logout beneran kepakai lewat tombol ini.
   logout(): void {
+    this.authService.logout();
     localStorage.clear();
     window.location.href = '/login';
   }

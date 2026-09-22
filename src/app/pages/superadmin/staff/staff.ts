@@ -7,6 +7,7 @@ import { ApiResponse } from '../../../shared/models/api-response';
 import { Staff, CreateStaffRequest, UpdateStaffRequest } from '../../../shared/models/staff.model';
 import { STAFF_STATUS_BADGE_STYLES, STAFF_ROLE_LABELS } from '../../../shared/config/staff-status-badge.config';
 import { StaffFormModalComponent } from '../../../shared/components/staff-form-modal/staff-form-modal';
+import { createDebouncedSearch } from '../../../shared/utils/debounced-search';
 
 @Component({
   selector: 'app-staff',
@@ -24,9 +25,19 @@ export class StaffComponent {
 
   protected readonly staffResource = httpResource<ApiResponse<Staff[]>>(() => this.apiUrl);
 
-  protected readonly staffList = computed(() =>
-    (this.staffResource.value()?.data ?? []).filter((staff) => !staff.deletedDate)
-  );
+  protected readonly search = createDebouncedSearch();
+
+  protected readonly staffList = computed(() => {
+    const active = (this.staffResource.value()?.data ?? []).filter((staff) => !staff.deletedDate);
+    const term = this.search.term();
+    if (!term) return active;
+    return active.filter(
+      (staff) =>
+        staff.namaLengkap.toLowerCase().includes(term) ||
+        staff.username.toLowerCase().includes(term) ||
+        staff.email.toLowerCase().includes(term)
+    );
+  });
   protected readonly isLoading = computed(() => this.staffResource.isLoading());
   protected readonly hasError = computed(() => !!this.staffResource.error());
 
@@ -35,6 +46,10 @@ export class StaffComponent {
   protected readonly isSubmitting = signal(false);
   protected readonly formError = signal<string | null>(null);
   protected readonly deletingId = signal<string | null>(null);
+
+  protected onSearchInput(event: Event): void {
+    this.search.onInput((event.target as HTMLInputElement).value);
+  }
 
   protected initials(namaLengkap: string): string {
     return namaLengkap
