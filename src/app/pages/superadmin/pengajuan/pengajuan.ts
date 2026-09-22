@@ -8,6 +8,7 @@ import { ApiPengajuan, mapApiPengajuanToLoanApplication } from '../../../shared/
 import { STATUS_BADGE_STYLES } from '../../../shared/config/status-badge.config';
 import { LoanQueueListComponent } from '../../../shared/components/loan-queue-list/loan-queue-list';
 import { LoanReviewDrawerComponent } from '../../../shared/components/loan-review-drawer/loan-review-drawer';
+import { createDebouncedSearch } from '../../../shared/utils/debounced-search';
 
 @Component({
   selector: 'app-pengajuan',
@@ -21,6 +22,7 @@ export class Pengajuan {
   protected readonly statusOptions = Object.keys(STATUS_BADGE_STYLES) as LoanStatus[];
   protected readonly statusFilter = signal<LoanStatus | 'ALL'>('ALL');
   protected readonly selectedId = signal<string | null>(null);
+  protected readonly search = createDebouncedSearch();
 
   private readonly apiUrl = `${environment.apiUrl}/pengajuan`;
 
@@ -32,8 +34,19 @@ export class Pengajuan {
 
   protected readonly items = computed(() => {
     const filter = this.statusFilter();
-    const all = this.allItems();
-    return filter === 'ALL' ? all : all.filter((item) => item.status === filter);
+    const term = this.search.term();
+    let result = this.allItems();
+
+    if (filter !== 'ALL') {
+      result = result.filter((item) => item.status === filter);
+    }
+    if (term) {
+      result = result.filter(
+        (item) =>
+          item.applicant.name.toLowerCase().includes(term) || item.appId.toLowerCase().includes(term)
+      );
+    }
+    return result;
   });
 
   protected readonly selectedItem = computed(
@@ -45,6 +58,10 @@ export class Pengajuan {
 
   protected onFilterChange(value: string): void {
     this.statusFilter.set(value as LoanStatus | 'ALL');
+  }
+
+  protected onSearchInput(event: Event): void {
+    this.search.onInput((event.target as HTMLInputElement).value);
   }
 
   protected selectItem(item: LoanApplication): void {
