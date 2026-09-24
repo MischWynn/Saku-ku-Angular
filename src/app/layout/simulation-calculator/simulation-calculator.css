@@ -1,222 +1,441 @@
-/* Card Wrapper Utama */
-.calculator-card {
+/* Simulasi pinjaman landing page - dark glass, 2 kolom (input | hasil) + perbandingan tenor. */
+
+.sim-wrapper {
   width: 100%;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.75rem;
-  padding: 2.25rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sim-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 @media (min-width: 1024px) {
-  .calculator-card {
-    grid-template-columns: 1.4fr 1fr;
-    gap: 3rem;
+  .sim-grid {
+    grid-template-columns: 1.15fr 1fr;
   }
 }
 
-/* Sisi Kiri */
-.calc-left {
+.sim-panel {
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 1.75rem;
 }
 
-.calc-title-group {
+@media (min-width: 640px) {
+  .sim-panel {
+    padding: 2.25rem;
+  }
+}
+
+/* ---------- Kiri: input ---------- */
+
+.sim-title-group {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.calc-icon-box {
+.sim-icon-box {
   width: 2.25rem;
   height: 2.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 0.75rem;
-  background-color: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.calc-heading {
-  font-size: 1.25rem;
+.sim-heading {
+  font-size: 1.2rem;
   font-weight: 700;
   color: #ffffff;
-  letter-spacing: -0.01em;
 }
 
-.form-section {
+.sim-subheading {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.sim-field {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.form-header {
+.sim-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.sim-amount-input {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 0.25rem;
+  transition: border-color 0.2s;
 }
 
-.label-text {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #94a3b8;
+.sim-amount-input:focus-within {
+  border-color: #10b981;
 }
 
-.value-highlight {
+.sim-amount-prefix {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #10B981;
+  color: #64748b;
 }
 
-/* Slider Bar */
-.custom-slider {
+.sim-amount-input input {
   width: 100%;
-  height: 8px;
-  background: #334155;
-  border-radius: 9999px;
+  background: transparent;
+  border: none;
   outline: none;
-  accent-color: #10B981;
-  cursor: pointer;
-  margin: 0.25rem 0;
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-.slider-bounds {
+/* Slider digambar sendiri (bukan tampilan bawaan browser) biar sama di Chrome, Edge, Firefox,
+   Safari. Bagian track yang "keisi" diwarnai lewat --fill (persen, di-set dari komponen). */
+.sim-slider {
+  --fill: 0%;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 1.25rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sim-slider:focus {
+  outline: none;
+}
+
+/* Chrome, Edge, Safari */
+.sim-slider::-webkit-slider-runnable-track {
+  height: 0.4rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, #10b981 0%, #22d3ee var(--fill), rgba(255, 255, 255, 0.15) var(--fill));
+}
+
+.sim-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: -0.375rem; /* (tinggi track - tinggi thumb) / 2 */
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+  transition: transform 0.15s;
+}
+
+.sim-slider:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.sim-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+/* Firefox */
+.sim-slider::-moz-range-track {
+  height: 0.4rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.sim-slider::-moz-range-progress {
+  height: 0.4rem;
+  border-radius: 999px;
+  background: linear-gradient(to right, #10b981, #22d3ee);
+}
+
+.sim-slider::-moz-range-thumb {
+  width: 1.15rem;
+  height: 1.15rem;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.sim-slider:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.sim-bounds {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #64748b;
-  font-weight: 500;
 }
 
-/* Tombol Tenor */
-.tenor-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
-}
-
-.btn-tenor-pill {
+.sim-segmented {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 0.25rem;
-  border-radius: 0.875rem;
-  background-color: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-tenor-pill:hover {
-  background-color: #334155;
-}
-
-.btn-tenor-pill.active {
-  background-color: #10B981;
-  border-color: #10B981;
-  color: #022c22;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
-}
-
-.tenor-month {
-  font-size: 0.8125rem;
-  font-weight: 700;
-}
-
-.tenor-rate {
-  font-size: 0.6875rem;
-  opacity: 0.85;
-}
-
-/* Sisi Kanan: Summary Box */
-.calc-right {
-  display: flex;
-}
-
-.summary-card {
-  width: 100%;
-  background-color: rgba(30, 41, 59, 0.7);
+  padding: 0.3rem;
+  gap: 0.25rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.25rem;
-  padding: 1.75rem;
-  display: flex;
-  flex-direction: column;
 }
 
-.summary-title {
-  font-size: 0.75rem;
+.sim-segment {
+  flex: 1;
+  padding: 0.6rem 0.25rem;
+  border-radius: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+  transition: all 0.2s;
+}
+
+.sim-segment:hover {
+  color: #ffffff;
+}
+
+.sim-segment.active {
+  color: #ffffff;
+  background: rgba(16, 185, 129, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.55);
+}
+
+.sim-hint {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+/* ---------- Kanan: hasil ---------- */
+
+.sim-result {
+  gap: 1.1rem;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(34, 211, 238, 0.14), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.16), transparent 55%),
+    rgba(15, 23, 42, 0.72);
+}
+
+.sim-result-label {
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #94a3b8;
+  text-transform: uppercase;
+  color: #6ee7b7;
 }
 
-.summary-main-price {
-  font-size: 2.25rem;
+.sim-result-amount {
+  font-size: 2.4rem;
   font-weight: 800;
+  line-height: 1.1;
   color: #ffffff;
-  margin: 0.5rem 0 1.5rem 0;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
-.summary-list {
+.sim-per {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-left: 0.25rem;
+}
+
+.sim-summary-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.7rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.summary-item {
+.sim-summary-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+  gap: 1rem;
   font-size: 0.875rem;
-}
-
-.item-label {
   color: #94a3b8;
 }
 
-.item-val {
-  font-weight: 600;
-  color: #f1f5f9;
+.sim-summary-item strong {
+  color: #ffffff;
+  font-weight: 700;
 }
 
-/* CTA Button */
-.btn-submit-loan {
-  width: 100%;
+.sim-split-bar {
+  height: 0.6rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #22d3ee;
+}
+
+.sim-split-pokok {
+  height: 100%;
+  background: #10b981;
+  transition: width 0.3s ease;
+}
+
+.sim-split-legend {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.dot {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  margin-right: 0.4rem;
+}
+
+.dot-pokok {
+  background: #10b981;
+}
+
+.dot-bunga {
+  background: #22d3ee;
+}
+
+.sim-cta {
+  margin-top: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.9rem;
-  border-radius: 0.875rem;
-  background-color: #10B981;
-  color: #022c22;
-  font-size: 0.9375rem;
+  width: 100%;
+  padding: 0.9rem 1.25rem;
+  border-radius: 999px;
   font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  color: #04160f;
+  background: linear-gradient(90deg, #10b981, #22d3ee);
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.btn-submit-loan:hover {
-  background-color: #059669;
+.sim-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(16, 185, 129, 0.4);
+}
+
+.sim-disclaimer {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* ---------- Perbandingan tenor ---------- */
+
+.sim-compare-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+}
+
+.sim-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .sim-compare-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.sim-compare-card {
+  position: relative;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+}
+
+.sim-compare-card:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.sim-compare-card.active {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: #10b981;
+}
+
+.sim-compare-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.sim-compare-tenor {
+  font-size: 0.85rem;
+  font-weight: 700;
   color: #ffffff;
 }
 
-.approval-note {
-  text-align: center;
+.sim-compare-rate {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.sim-compare-amount {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.sim-compare-amount span {
   font-size: 0.75rem;
-  color: #64748b;
-  margin-top: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-left: 0.15rem;
+}
+
+.sim-compare-total {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.sim-badge {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.badge-light {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.badge-cheap {
+  color: #67e8f9;
+  background: rgba(34, 211, 238, 0.15);
 }

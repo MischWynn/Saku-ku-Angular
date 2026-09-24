@@ -4,11 +4,7 @@
   <div class="glow-spot-top"></div>
   <div class="glow-spot-bottom"></div>
   <div class="dot-grid-overlay"></div>
-  <div class="mesh-blob mesh-blob-1"></div>
-  <div class="mesh-blob mesh-blob-2"></div>
-  <div class="mesh-blob mesh-blob-3"></div>
-  <div class="mesh-blob mesh-blob-4"></div>
-  <div class="mesh-blob mesh-blob-5"></div>
+
 
   <!-- Hero Content Section -->
   <section id="beranda" class="hero-section">
@@ -113,6 +109,7 @@
 
 <section id="fitur" class="section-container scroll-mt-36">
   <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
+  <div class="mesh-blob mesh-blob-1"></div>
   <div class="section-header reveal">
     <h2 class="section-title">Mengapa Memilih Saku-ku?</h2>
     <p class="section-subtitle">
@@ -124,8 +121,8 @@
     
     <!-- Fitur 1: Proses Kilat -->
     <div class="feature-card group reveal">
-      <div class="feature-icon-box">
-        <svg lucideClock class="w-5 h-5 text-[#6EE7B7]"></svg>
+      <div class="feature-illustration">
+        <img src="assets/Fast.png" alt="Proses Kilat" class="feature-illustration-img" loading="lazy" />
       </div>
       <h3 class="feature-title">Proses Kilat</h3>
       <p class="feature-desc">
@@ -133,32 +130,10 @@
       </p>
     </div>
 
-    <!-- Fitur 2: Keamanan Terjamin -->
+    <!-- Fitur 2: Tanpa Jaminan -->
     <div class="feature-card group reveal">
-      <div class="feature-icon-box">
-        <svg lucideShieldCheck class="w-5 h-5 text-[#10B981]"></svg>
-      </div>
-      <h3 class="feature-title">Keamanan Terjamin</h3>
-      <p class="feature-desc">
-        Data Anda dienkripsi tingkat bank dan diawasi ketat oleh otoritas terkait.
-      </p>
-    </div>
-
-    <!-- Fitur 3: Bunga Kompetitif -->
-    <div class="feature-card group reveal">
-      <div class="feature-icon-box">
-        <svg lucidePercent class="w-5 h-5 text-[#6EE7B7]"></svg>
-      </div>
-      <h3 class="feature-title">Bunga Kompetitif</h3>
-      <p class="feature-desc">
-        Nikmati suku bunga rendah dan transparan tanpa ada biaya tersembunyi.
-      </p>
-    </div>
-
-    <!-- Fitur 4: Tanpa Jaminan -->
-    <div class="feature-card group reveal">
-      <div class="feature-icon-box">
-        <svg lucideHandCoins class="w-5 h-5 text-[#10B981]"></svg>
+      <div class="feature-illustration">
+        <img src="assets/Finance.png" alt="Tanpa Jaminan" class="feature-illustration-img" loading="lazy" />
       </div>
       <h3 class="feature-title">Tanpa Jaminan</h3>
       <p class="feature-desc">
@@ -166,14 +141,35 @@
       </p>
     </div>
 
+    <!-- Fitur 3: Bunga Kompetitif -->
+    <div class="feature-card group reveal">
+      <div class="feature-illustration">
+        <img src="assets/Rate.png" alt="Bunga Kompetitif" class="feature-illustration-img" loading="lazy" />
+      </div>
+      <h3 class="feature-title">Bunga Kompetitif</h3>
+      <p class="feature-desc">
+        Nikmati suku bunga rendah dan transparan tanpa ada biaya tersembunyi.
+      </p>
+    </div>
+
+    <!-- Fitur 4: Keamanan Terjamin -->
+    <div class="feature-card group reveal">
+      <div class="feature-illustration">
+        <img src="assets/Secure.png" alt="Keamanan Terjamin" class="feature-illustration-img" loading="lazy" />
+      </div>
+      <h3 class="feature-title">Keamanan Terjamin</h3>
+      <p class="feature-desc">
+        Data Anda dienkripsi tingkat bank dan diawasi ketat oleh otoritas terkait.
+      </p>
+    </div>
+
   </div>
 
 </section>
 
-<!-- CARA KERJA (WORKFLOW 4 LANGKAH) -->
-
 <section id="cara-kerja" class="section-container scroll-mt-36">
   <div class="section-glow section-glow-emerald" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
+  <div class="mesh-blob mesh-blob-2"></div>
   <div class="section-header reveal">
     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/10 border border-[#10B981]/30 mb-3">
       <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
@@ -243,6 +239,8 @@
 
 <section id="tarif" class="section-container scroll-mt-36">
   <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
+  <div class="mesh-blob mesh-blob-3"></div>
+  <div class="mesh-blob mesh-blob-1"></div>
   <div class="section-header reveal">
     <h2 class="section-title">Produk Suku Bunga</h2>
     <p class="section-subtitle">
@@ -267,7 +265,6 @@
         <span class="rate-label">Bunga Efektif per tahun</span>
       </div>
 
-      <!-- 18 Bulan (Populer Pill) -->
       <div class="rate-item-box rate-popular">
         <div class="popular-badge">Populer</div>
         <span class="rate-tenor text-[#6EE7B7]">18 BULAN</span>
@@ -275,7 +272,6 @@
         <span class="rate-label">Bunga Efektif per tahun</span>
       </div>
 
-      <!-- 24 Bulan -->
       <div class="rate-item-box">
         <span class="rate-tenor">24 BULAN</span>
         <h4 class="rate-value">12.0%</h4>
@@ -291,9 +287,11 @@
 
 </section>
 
-<!-- SIMULASI KREDIT -->
 <section id="simulasi" class="section-container scroll-mt-36">
   <div class="section-glow section-glow-emerald" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
+  <div class="mesh-blob mesh-blob-3"></div>
+  <div class="mesh-blob mesh-blob-4"></div>
+  <div class="mesh-blob mesh-blob-5"></div>
   <div class="section-header reveal">
     <span class="hero-badge">Simulasi Instan</span>
     <h2 class="section-title">Hitung Estimasi Pinjaman</h2>
@@ -302,22 +300,21 @@
     </p>
   </div>
 
-  <!-- Samakan dengan lebar container atas -->
   <div class="w-full max-w-6xl mx-auto reveal">
     <app-loan-simulation></app-loan-simulation>
   </div>
 </section>
 
-<!--  BILLBOARDS CTA BANNER SECTION -->
 
 <section class="billboard-section">
   <div class="section-glow section-glow-mint" aria-hidden="true" style="display: block; opacity: 1; visibility: visible;"></div>
+  <div class="mesh-blob mesh-blob-1"></div>
   <div class="billboard-split-container reveal">
+    <!-- Blob dekoratif di dalam kartu, di belakang teks & gambar -->
+    <div class="billboard-blob billboard-blob-1" aria-hidden="true"></div>
+    <div class="billboard-blob billboard-blob-2" aria-hidden="true"></div>
+    <div class="billboard-blob billboard-blob-3" aria-hidden="true"></div>
     <div class="billboard-text-side">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold text-[#6EE7B7] bg-[#10B981]/15 border border-[#10B981]/30 mb-3 w-fit">
-        <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
-        Ekspansi Finansial Terpercaya
-      </div>
       <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug">
         Siap Mewujudkan Rencana Finansial Anda?
       </h2>
@@ -332,8 +329,12 @@
       </div>
     </div>
     <div class="billboard-visual-side">
-      <img src="assets/Billboards_Fix.png" alt="Saku-ku Billboard" class="billboard-visual-img" />
-      <div class="billboard-visual-tint"></div>
+      <!-- Titik-titik cahaya dekoratif di sekitar kartu (niru referensi banner lampu) -->
+      <span class="billboard-spark spark-1" aria-hidden="true"></span>
+      <span class="billboard-spark spark-2" aria-hidden="true"></span>
+      <span class="billboard-spark spark-3" aria-hidden="true"></span>
+      <span class="billboard-spark spark-4" aria-hidden="true"></span>
+      <img src="assets/Card.png" alt="Kartu Saku-ku: Pinjaman Tunai Dana Segar, Cair Langsung ke Rekeningmu" class="billboard-visual-img" />
     </div>
   </div>
 </section>
@@ -379,7 +380,6 @@
         </ul>
       </div>
 
-      <!-- Col 4: Hubungi Kami -->
       <div class="space-y-3">
         <h4 class="footer-col-title">Hubungi Kami</h4>
         <p class="text-xs text-slate-300 font-medium select-text">admin@saku-ku.com</p>

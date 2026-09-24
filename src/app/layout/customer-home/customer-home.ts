@@ -2,10 +2,6 @@ import { Component, ElementRef, DestroyRef, AfterViewInit, inject } from '@angul
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
-  LucideShieldCheck,
-  LucideClock,
-  LucidePercent,
-  LucideHandCoins,
   LucideUserPlus,
   LucideFileText,
   LucideSearchCheck,
@@ -19,10 +15,6 @@ import { LoanSimulationComponent } from '../simulation-calculator/simulation-cal
   imports: [
     CommonModule,
     RouterLink,
-    LucideShieldCheck,
-    LucideClock,
-    LucidePercent,
-    LucideHandCoins,
     LucideUserPlus,
     LucideFileText,
     LucideSearchCheck,
