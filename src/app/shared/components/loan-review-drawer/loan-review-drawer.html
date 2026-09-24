@@ -77,21 +77,28 @@
         @if (app.applicant.occupation) {
           <div class="grid grid-cols-2 gap-3 text-xs">
             <div>
+              <span class="text-slate-500 block mb-0.5">Sector</span>
+              <p class="text-slate-100 font-medium">{{ employmentSector() }}</p>
+            </div>
+            <div>
               <span class="text-slate-500 block mb-0.5">Occupation</span>
               <p class="text-slate-100 font-medium">{{ app.applicant.occupation }}</p>
             </div>
-            <div>
-              <span class="text-slate-500 block mb-0.5">{{ employmentLabel() }}</span>
-              <p class="text-slate-100 font-medium">{{ app.applicant.employmentLengthMonths }} bulan</p>
-            </div>
-            <div>
+            <div class="col-span-2">
               <span class="text-slate-500 block mb-0.5">Monthly Income</span>
               <p class="text-emerald-400 font-bold text-sm">Rp {{ app.applicant.monthlyIncome | number }}</p>
+            </div>
+            <!-- Sementara disembunyiin (keputusan 23 Sept): Lama Bekerja/Usaha & Existing Debts.
+                 Datanya tetap ada di model (employmentLengthMonths, existingDebts) kalau mau dibalikin.
+            <div>
+              <span class="text-slate-500 block mb-0.5">Lama Bekerja</span>
+              <p class="text-slate-100 font-medium">{{ app.applicant.employmentLengthMonths }} bulan</p>
             </div>
             <div>
               <span class="text-slate-500 block mb-0.5">Existing Debts</span>
               <p class="text-rose-400 font-bold text-sm">Rp {{ app.applicant.existingDebts | number }} /bln</p>
             </div>
+            -->
           </div>
         } @else {
           <p class="text-slate-500 text-xs italic">Data pekerjaan & finansial belum tersedia — menunggu pelengkapan data nasabah.</p>

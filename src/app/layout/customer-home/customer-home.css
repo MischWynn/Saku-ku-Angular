@@ -256,10 +256,37 @@
   @apply relative w-full max-w-6xl mx-auto px-4 sm:px-6 my-16 select-none;
 }
 
+/* 24 Sept 2026: disamain sama panel hasil simulasi (.sim-result di simulation-calculator):
+   navy gelap + glow cyan kanan atas & emerald kiri bawah (glow-nya dari .billboard-blob). */
 .billboard-split-container {
   @apply relative min-h-[380px] sm:min-h-[440px] rounded-3xl overflow-hidden border grid grid-cols-1 lg:grid-cols-2 shadow-2xl;
-  border-color: rgba(255, 255, 255, 0.08);
-  background-color: rgba(17, 24, 39, 0.9);
+  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(15, 23, 42, 0.92);
+}
+
+/* Blob blur di dalam kartu billboard (container udah overflow-hidden, jadi blob kepotong rapi
+   di tepi kartu). z-0 - teks & gambar di atasnya pakai z-10. */
+.billboard-blob {
+  @apply absolute rounded-full pointer-events-none z-0;
+  filter: blur(60px);
+}
+
+/* emerald kiri bawah */
+.billboard-blob-1 {
+  @apply w-80 h-80 -bottom-32 -left-24;
+  background: rgba(16, 185, 129, 0.22);
+}
+
+/* glow tipis di belakang gambar kartu */
+.billboard-blob-2 {
+  @apply w-72 h-72 top-1/2 right-[20%] -translate-y-1/2;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+/* cyan kanan atas */
+.billboard-blob-3 {
+  @apply w-80 h-80 -top-32 -right-24;
+  background: rgba(34, 211, 238, 0.18);
 }
 
 .billboard-text-side {
@@ -278,25 +305,31 @@
   background-color: #6EE7B7;
 }
 
+/* Visual kanan: Card.png (latar transparan) ditaruh utuh (contain), bukan foto full-bleed lagi -
+   clip-path miring & tint lama dibuang karena cuma relevan buat foto. */
 .billboard-visual-side {
-  @apply relative overflow-hidden min-h-[240px] lg:min-h-full;
-  clip-path: polygon(8% 0, 100% 0, 100% 100%, 0% 100%);
+  @apply relative z-10 flex items-center justify-center min-h-[240px] lg:min-h-full p-6 sm:p-10;
 }
 
 .billboard-visual-img {
-  @apply absolute inset-0 w-full h-full object-cover transition-transform duration-700;
-  /* filter: grayscale(100%) brightness(0.9) sepia(0%) hue-rotate(100deg) saturate(3); */
+  @apply relative z-10 w-full max-w-[420px] h-auto object-contain transition-transform duration-700;
+  filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.45));
 }
 
 .billboard-visual-side:hover .billboard-visual-img {
-  @apply scale-105;
+  @apply scale-105 -rotate-1;
 }
 
-.billboard-visual-tint {
-  @apply absolute inset-0;
-  background: linear-gradient(135deg, rgba(16,185,129,0.35), rgba(2,6,23,0.55));
-  mix-blend-mode: multiply;
+.billboard-spark {
+  @apply absolute rounded-full;
+  background: #6ee7b7;
+  box-shadow: 0 0 12px 3px rgba(110, 231, 183, 0.6);
 }
+
+.spark-1 { @apply w-2 h-2 top-[18%] left-[14%]; }
+.spark-2 { @apply w-1.5 h-1.5 top-[28%] right-[12%]; }
+.spark-3 { @apply w-2.5 h-2.5 bottom-[20%] left-[20%]; }
+.spark-4 { @apply w-1.5 h-1.5 bottom-[14%] right-[18%]; }
 
 .footer-wrapper {
   @apply w-full border-t select-none;
@@ -391,10 +424,18 @@
   box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.2);
 }
 
-.feature-icon-box {
-  @apply w-11 h-11 rounded-2xl flex items-center justify-center mb-5 border;
-  background-color: rgba(16, 185, 129, 0.12);
-  border-color: rgba(16, 185, 129, 0.25);
+/* 24 Sept 2026: ikon kecil diganti ilustrasi besar di atas kartu (niru referensi "Our Services"). */
+.feature-illustration {
+  @apply w-full h-40 rounded-2xl flex items-center justify-center mb-5 overflow-hidden;
+  background: radial-gradient(circle at 50% 60%, rgba(110, 231, 183, 0.16), rgba(16, 185, 129, 0.04) 70%);
+}
+
+.feature-illustration-img {
+  @apply h-full w-auto object-contain transition-transform duration-300;
+}
+
+.feature-card:hover .feature-illustration-img {
+  @apply scale-105;
 }
 
 .feature-title {

@@ -2,7 +2,7 @@ import { Component, input, output, computed, signal, effect } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { httpResource } from '@angular/common/http';
-import { LoanApplication, UserRole, ReviewActionPayload } from '../../models/loan-application';
+import { LoanApplication, UserRole, ReviewActionPayload, EMPLOYMENT_TYPE_LABELS } from '../../models/loan-application';
 import { ROLE_REVIEW_CONFIG } from '../../config/review-action.config';
 import { STATUS_BADGE_STYLES } from '../../config/status-badge.config';
 import { environment } from '../../../../environments/environment';
@@ -34,9 +34,12 @@ export class LoanReviewDrawerComponent {
   protected readonly nominalDisetujuiInput = signal<number>(0);
   protected readonly showNominalDisetujui = computed(() => this.role() === 'BM');
 
-  protected readonly employmentLabel = computed(() =>
-    this.item()?.applicant.employmentType === 'WIRASWASTA' ? 'Lama Usaha' : 'Lama Bekerja'
-  );
+  // Sektor/bidang kerja (ASN, BUMN, Swasta, dst) - gantiin Lama Bekerja/Lama Usaha yang
+  // sementara disembunyiin dari section Employment & Financial.
+  protected readonly employmentSector = computed(() => {
+    const type = this.item()?.applicant.employmentType;
+    return type ? (EMPLOYMENT_TYPE_LABELS[type] ?? type) : '-';
+  });
 
   // DBR (Debt Burden Ratio) — cicilan bulanan dibagi pendapatan bulanan. Informational
   // buat bantu keputusan staff, BUKAN hard-block otomatis. null kalau pendapatan_bulanan

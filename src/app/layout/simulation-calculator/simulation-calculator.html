@@ -1,91 +1,133 @@
-<div class="calculator-card">
-  <!-- Sisi Kiri: Atur Pinjaman -->
-<div class="calc-left">
-    <div class="calc-title-group">
-      <div class="calc-icon-box">
-        <svg lucideSlidersHorizontal class="w-6 h-6 text-emerald-600"></svg>
+<div class="sim-wrapper">
+  <div class="sim-grid">
+    <!-- KIRI: input -->
+    <div class="sim-panel">
+      <div class="sim-title-group">
+        <div class="sim-icon-box">
+          <svg lucideSlidersHorizontal class="w-5 h-5 text-emerald-400"></svg>
+        </div>
+        <div>
+          <h3 class="sim-heading">Atur Pinjaman</h3>
+          <p class="sim-subheading">Geser atau ketik nominalnya</p>
+        </div>
       </div>
-      <div class="calc-text-wrap">
-        <h3 class="calc-heading">Atur Pinjaman Anda</h3>
-        <p class="calc-description">Sesuaikan nominal dan jangka waktu</p>
+
+      <!-- Nominal -->
+      <div class="sim-field">
+        <span class="sim-label">Jumlah pinjaman</span>
+        <div class="sim-amount-input">
+          <span class="sim-amount-prefix">Rp</span>
+          <input
+            type="text"
+            inputmode="numeric"
+            aria-label="Jumlah pinjaman"
+            [value]="nominal() | number: '1.0-0'"
+            (change)="onNominalTyped($event)"
+          />
+        </div>
+        <input
+          type="range"
+          class="sim-slider"
+          aria-label="Geser jumlah pinjaman"
+          [min]="minNominal"
+          [max]="maxNominal()"
+          [step]="nominalStep"
+          [value]="nominal()"
+          [style.--fill]="sliderFillPercent() + '%'"
+          (input)="onSliderInput($event)"
+        />
+        <div class="sim-bounds">
+          <span>Rp {{ minNominal | number: '1.0-0' }}</span>
+          <span>Rp {{ maxNominal() | number: '1.0-0' }}</span>
+        </div>
       </div>
-    </div>
-    <!-- 1. Nominal Pinjaman -->
-    <div class="form-section">
-      <div class="form-header">
-        <span class="label-text">Jumlah Pinjaman</span>
-        <span class="value-highlight">Rp {{ loanAmount | number:'1.0-0' }}</span>
-      </div>
-      <input 
-        type="range" 
-        min="1000000" 
-        max="50000000" 
-        step="500000"
-        [(ngModel)]="loanAmount" 
-        class="custom-slider"
-      />
-      <div class="slider-bounds">
-        <span>Rp 1 Juta</span>
-        <span>Rp 50 Juta</span>
+
+      <!-- Tenor -->
+      <div class="sim-field">
+        <span class="sim-label">Jangka waktu</span>
+        <div class="sim-segmented" role="group" aria-label="Pilih tenor">
+          @for (option of tenorOptions(); track option.tenor) {
+            <button
+              type="button"
+              class="sim-segment"
+              [class.active]="selectedTenor() === option.tenor"
+              (click)="selectTenor(option.tenor)"
+            >
+              {{ option.tenor }} bln
+            </button>
+          }
+        </div>
+        <p class="sim-hint">Tenor panjang = cicilan lebih ringan, tapi total bunga lebih besar.</p>
       </div>
     </div>
 
-    <!-- 2. Pilihan Tenor -->
-    <div class="form-section">
-      <div class="form-header">
-        <span class="label-text">Jangka Waktu (Tenor)</span>
-        <span class="value-highlight">{{ tenorMonths }} Bulan</span>
+    <!-- KANAN: hasil -->
+    <div class="sim-panel sim-result">
+      <span class="sim-result-label">Estimasi cicilan per bulan</span>
+      <div class="sim-result-amount">
+        Rp {{ selected().cicilan | number: '1.0-0' }}<span class="sim-per">/bulan</span>
       </div>
-      <div class="tenor-grid">
-        @for (option of tenorOptions; track option) {
-          <button 
-            type="button" 
-            (click)="setTenor(option)"
-            [class.active]="tenorMonths === option"
-            class="btn-tenor-pill"
-          >
-            <span class="tenor-month">{{ option }} Bulan</span>
-            <span class="tenor-rate">{{ interestRateMap[option] }}% / thn</span>
-          </button>
-        }
+
+      <!-- Bunga flat per tenor dibagi rata per bulan (8% / 12 bulan = 0,67% / bulan) -->
+      <div class="sim-summary-list">
+        <div class="sim-summary-item">
+          <span>Suku Bunga (Flat)</span>
+          <strong>{{ selected().interestRate / selected().tenor | number: '1.1-2' }}% / Bulan</strong>
+        </div>
+        <div class="sim-summary-item">
+          <span>Total Pinjaman Pokok</span>
+          <strong>Rp {{ nominal() | number: '1.0-0' }}</strong>
+        </div>
+        <div class="sim-summary-item">
+          <span>Total Pembayaran</span>
+          <strong>Rp {{ selected().total | number: '1.0-0' }}</strong>
+        </div>
       </div>
+
+      <!-- Pokok vs bunga -->
+      <div class="sim-split-bar" aria-hidden="true">
+        <div class="sim-split-pokok" [style.width.%]="pokokPercent()"></div>
+      </div>
+      <div class="sim-split-legend">
+        <span><i class="dot dot-pokok"></i>Pokok Rp {{ nominal() | number: '1.0-0' }}</span>
+        <span><i class="dot dot-bunga"></i>Bunga Rp {{ selected().totalBunga | number: '1.0-0' }}</span>
+      </div>
+
+      <!-- TODO: arahin ke halaman daftar / download app kalau udah ada -->
+      <button type="button" class="sim-cta">
+        <span>Ajukan Sekarang</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </button>
+      <p class="sim-disclaimer">Hasil ini estimasi. Nominal akhir mengikuti hasil review pengajuan.</p>
     </div>
   </div>
 
-  <!-- Sisi Kanan: Summary Breakdown -->
-  <div class="calc-right">
-    <div class="summary-card">
-      <span class="summary-title">ESTIMASI CICILAN BULANAN</span>
-      
-      <!-- Highlight Angsuran Per Bulan -->
-      <div class="summary-main-price">
-        Rp {{ monthlyInstallment | number:'1.0-0' }}
-      </div>
-
-      <!-- Ringkasan 3 Baris -->
-      <div class="summary-list">
-        <div class="summary-item">
-          <span class="item-label">Suku Bunga (Flat)</span>
-          <span class="item-val">{{ (currentInterestRate / 12) | number:'1.1-2' }}% / Bulan</span>
-        </div>
-        <div class="summary-item">
-          <span class="item-label">Total Pinjaman Pokok</span>
-          <span class="item-val">Rp {{ loanAmount | number:'1.0-0' }}</span>
-        </div>
-        <div class="summary-item">
-          <span class="item-label">Total Pembayaran</span>
-          <span class="item-val">Rp {{ totalRepayment | number:'1.0-0' }}</span>
-        </div>
-      </div>
-
-      <!-- Tombol CTA & Info -->
-      <button type="button" class="btn-submit-loan">
-        <span>Ajukan Sekarang</span>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-        </svg>
-      </button>
-      <p class="approval-note">*Nominal dapat berubah sesuai dengan kebijakan yang berlaku</p>
+  <!-- Perbandingan semua tenor -->
+  <div class="sim-compare">
+    <h4 class="sim-compare-title">Perbandingan dengan semua tenor yang tersedia</h4>
+    <div class="sim-compare-grid">
+      @for (r of results(); track r.tenor) {
+        <button
+          type="button"
+          class="sim-compare-card"
+          [class.active]="selectedTenor() === r.tenor"
+          (click)="selectTenor(r.tenor)"
+        >
+          <div class="sim-compare-head">
+            <span class="sim-compare-tenor">{{ r.tenor }} bulan</span>
+            <span class="sim-compare-rate">bunga {{ r.interestRate }}%</span>
+          </div>
+          <div class="sim-compare-amount">Rp {{ r.cicilan | number: '1.0-0' }}<span>/bln</span></div>
+          <div class="sim-compare-total">Total Rp {{ r.total | number: '1.0-0' }}</div>
+          @if (r.tenor === lightestTenor()) {
+            <span class="sim-badge badge-light">Cicilan paling ringan</span>
+          } @else if (r.tenor === cheapestTenor()) {
+            <span class="sim-badge badge-cheap">Bunga paling kecil</span>
+          }
+        </button>
+      }
     </div>
   </div>
 </div>
