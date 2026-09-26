@@ -1,0 +1,36 @@
+# CI frontend Saku-Ku (Angular). Deploy tetap diurus Vercel (auto-deploy dari GitHub) - workflow
+# ini cuma "penjaga": build + unit test tiap push/PR, biar error ketahuan SEBELUM Vercel deploy.
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, feature/saku-ku]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: fe-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node LTS (bukan v25 kayak di laptop) - Node 25 punya bug localStorage vs Vitest
+      # (vitest-dev/vitest#8757). Samain dengan Node version di Vercel Project Settings.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (production)
+        run: npm run build
+
+      - name: Unit test (Vitest)
+        run: npm run test:ci
